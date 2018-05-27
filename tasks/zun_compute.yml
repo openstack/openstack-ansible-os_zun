@@ -1,0 +1,197 @@
+---
+# Copyright 2018, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Add zypper repository
+  zypper_repository:
+    auto_import_keys: yes
+    autorefresh: yes
+    name: "{{ item.name }}"
+    repo: "{{ item.uri }}"
+    runrefresh: yes
+  with_items: "{{ zun_docker_repo }}"
+  when:
+    - ansible_pkg_mgr == 'zypper'
+
+- name: Run apt install block
+  block:
+    - name: Get apt gpg key
+      get_url:
+        url: "{{ item.gpg_uri }}"
+        dest: "/tmp/{{ item.name }}"
+        mode: 0440
+      with_items: "{{ zun_docker_repo }}"
+
+    - name: Add Apt signing key on remote server to keyring
+      apt_key:
+        file: "/tmp/{{ item.name }}"
+        state: present
+      with_items: "{{ zun_docker_repo }}"
+
+    - name: Add apt repository
+      apt_repository:
+        repo: deb [arch=amd64] {{ item.uri }} {{ ansible_distribution_release | lower }} stable
+        state: present
+        filename: "{{ item.name }}"
+      with_items: "{{ zun_docker_repo }}"
+  when:
+    - ansible_pkg_mgr == 'apt'
+
+- name: Add yum repository
+  get_url:
+    url: "{{ item.uri }}"
+    dest: "/etc/yum.repos.d/{{ item.name }}.repo"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ zun_docker_repo }}"
+  when:
+    - ansible_pkg_mgr == 'yum'
+
+- name: Install compute distro packages
+  package:
+    name: "{{ zun_distro_compute_packages }}"
+    state: "{{ zun_package_state }}"
+    update_cache: "{{ (ansible_pkg_mgr in ['apt', 'zypper']) | ternary('yes', omit) }}"
+    cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
+
+- name: Generate kuryr config
+  config_template:
+    content: |
+      {
+        "live-restore": true
+      }
+    dest: "/etc/docker/daemon.json"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    config_overrides: "{{ zun_docker_config_overrides }}"
+    config_type: "json"
+  notify:
+    - Restart kuryr services
+
+- name: Create the kuryr system group
+  group:
+    name: "{{ zun_kuryr_system_group_name }}"
+    gid: "{{ zun_kuryr_system_group_gid | default(omit) }}"
+    state: "present"
+    system: "yes"
+  tags:
+    - zun-kuryr-group
+
+- name: Remove old kuryr key file(s) if found
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  with_items:
+    - "{{ zun_kuryr_system_home_folder }}/.ssh/authorized_keys"
+    - "{{ zun_kuryr_system_home_folder }}/.ssh/id_rsa"
+    - "{{ zun_kuryr_system_home_folder }}/.ssh/id_rsa.pub"
+  when:
+    - zun_recreate_keys | bool
+  tags:
+    - zun-kuryr-key
+    - zun-kuryr-key-create
+
+- name: Create the kuryr system user
+  user:
+    name: "{{ zun_kuryr_system_user_name }}"
+    uid: "{{ zun_kuryr_system_user_uid | default(omit) }}"
+    group: "{{ zun_kuryr_system_group_name }}"
+    comment: "{{ zun_kuryr_system_comment }}"
+    shell: "{{ zun_kuryr_system_shell }}"
+    system: "yes"
+    createhome: "yes"
+    home: "{{ zun_kuryr_system_home_folder }}"
+    generate_ssh_key: "yes"
+  tags:
+    - zun-kuryr-user
+    - zun-kuryr-key
+    - zun-kuryr-key-create
+
+- name: Create kuryr dir
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  with_items:
+    - path: "/etc/kuryr"
+      mode: "0750"
+      owner: "{{ zun_kuryr_system_user_name }}"
+      group: "{{ zun_kuryr_system_group_name }}"
+    - path: "/etc/systemd/system/docker.service.d"
+    - path: "/etc/docker/plugins"
+  tags:
+    - zun-kuryr-dirs
+
+- name: Generate kuryr config
+  config_template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ zun_kuryr_system_user_name }}"
+    group: "{{ zun_system_group_name }}"
+    mode: "0640"
+    config_overrides: "{{ item.config_overrides }}"
+    config_type: "{{ item.config_type }}"
+  with_items:
+    - src: "kuryr-libnetwork.conf.j2"
+      dest: "/etc/kuryr/kuryr.conf"
+      config_overrides: "{{ zun_kuryr_conf_overrides }}"
+      config_type: "ini"
+    - src: "systemd-docker-override.conf.j2"
+      dest: "/etc/systemd/system/docker.service.d/zun-docker.conf"
+      config_overrides: "{{ zun_kuryr_conf_overrides }}"
+      config_type: "ini"
+  notify:
+    - Manage LB
+    - Restart kuryr services
+  tags:
+    - zun-config
+    - zun-post-install
+
+- name: Generate kuryr docker plugin config
+  config_template:
+    content: |
+      {
+        "Name": "kuryr",
+        "Addr": "http://127.0.0.1:23750"
+      }
+    dest: "/etc/docker/plugins/kuryr.json"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    config_overrides: "{{ zun_kuryr_config_overrides }}"
+    config_type: "json"
+  notify:
+    - Restart kuryr services
+
+- name: Ensure docker users are added to the docker group
+  user:
+    name: "{{ item }}"
+    group: docker
+    append: yes
+  with_items: "{{ zun_docker_users }}"
+
+- name: Drop sudoers file
+  template:
+    src: "sudoers.j2"
+    dest: "/etc/sudoers.d/{{ zun_system_user_name }}_sudoers"
+    mode: "0440"
+    owner: "root"
+    group: "root"
+  tags:
+    - sudoers
+    - zun-sudoers
