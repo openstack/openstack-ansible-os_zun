@@ -226,6 +226,7 @@ zun_requires_pip_packages: []
 zun_pip_packages:
   - kuryr-libnetwork
   - oslo_rootwrap
+  - osprofiler
   - python-memcached
   - python-zunclient
   - pymysql
