@@ -19,11 +19,17 @@
   tasks:
     - name: Pull cirros image
       command: docker pull cirros
+      # TODO(cloudnull): Set up failed_when and changed_when conditions
+      tags:
+        - skip_ansible_lint
 
     - name: Upload image into glance
       shell: |
         . /root/openrc
         docker save cirros | /openstack/venvs/zun-untagged/bin/openstack image create zun-cirros --public --container-format docker --disk-format raw
+      # TODO(cloudnull): Set up failed_when and changed_when conditions
+      tags:
+        - skip_ansible_lint
 
 - name: Run zun service check
   hosts: zun_api[0]
@@ -33,8 +39,12 @@
       shell: |
         . /root/openrc
         /openstack/venvs/zun-untagged/bin/openstack appcontainer service list
+      changed_when: false
 
     - name: Create zun container
       shell: |
         . /root/openrc
         /openstack/venvs/zun-untagged/bin/openstack appcontainer run --name container-check --net network=private zun-cirros ping 127.0.0.1
+      # TODO(cloudnull): Set up failed_when and changed_when conditions
+      tags:
+        - skip_ansible_lint
