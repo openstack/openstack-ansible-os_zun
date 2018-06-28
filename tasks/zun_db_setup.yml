@@ -25,7 +25,7 @@
     login_host: "{{ zun_galera_address }}"
     name: "{{ zun_galera_database }}"
     state: "present"
-  delegate_to: "{{ groups['galera_all'][0] }}"
+  delegate_to: "{{ zun_db_setup_host }}"
   no_log: True
 
 - name: Grant access to the DB for the service
@@ -38,7 +38,8 @@
     host: "{{ item }}"
     state: "present"
     priv: "{{ zun_galera_database }}.*:ALL"
-    append_privs: "{{ db_append_privs | default(omit) }}"
-  delegate_to: "{{ groups['galera_all'][0] }}"
-  with_items: "{{ grant_list | default(['localhost', '%']) }}"
+  delegate_to: "{{ zun_db_setup_host }}"
+  with_items:
+    - "localhost"
+    - "%"
   no_log: True

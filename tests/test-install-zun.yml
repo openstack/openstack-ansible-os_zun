@@ -23,7 +23,6 @@
       zun_service_password: secrete
       zun_kuryr_service_password: secrete
       zun_developer_mode: true
-      zun_galera_address: "{{ hostvars[groups['galera_all'][0]]['ansible_host'] }}"
       zun_rabbitmq_servers: "{{ hostvars[groups['rabbitmq_all'][0]]['ansible_host'] }}"
       zun_service_publicuri: "http://{{ hostvars[groups['keystone_all'][0]]['ansible_host'] }}:9517"
       zun_service_adminuri: "http://{{ hostvars[groups['keystone_all'][0]]['ansible_host'] }}:9517"
