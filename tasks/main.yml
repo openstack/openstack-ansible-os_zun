@@ -93,6 +93,7 @@
     loop_var: service_var
   tags:
     - zun-config
+    - systemd-service
 
 - name: Run the etcd service role
   include_role:
