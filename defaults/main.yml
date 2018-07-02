@@ -26,6 +26,11 @@ zun_ceilometer_enabled: False
 ## Verbosity Options
 debug: False
 
+# Set the host which will execute the shade modules
+# for the service setup. The host must already have
+# clouds.yaml properly configured.
+zun_service_setup_host: "{{ openstack_service_setup_host | default('localhost') }}"
+
 # Set the package install state for distribution and pip packages
 # Options are 'present' and 'latest'
 zun_package_state: "latest"
@@ -224,7 +229,6 @@ zun_services:
     execstarts: "{{ zun_bin }}/zun-wsproxy --config-dir /etc/zun"
 
 # Common pip packages
-zun_requires_pip_packages: []
 zun_pip_packages:
   - kuryr-libnetwork
   - oslo_rootwrap

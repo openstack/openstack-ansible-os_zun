@@ -15,7 +15,7 @@
 
 - name: Installation and setup of Zun
   hosts: zun_all
-  become: true
+  remote_user: root
   roles:
     - role: "os_zun"
       zun_rabbitmq_password: secrete
