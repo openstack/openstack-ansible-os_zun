@@ -21,7 +21,7 @@
     daemon_reload: yes
   with_items: "{{ filtered_zun_services }}"
   register: _stop
-  until: _stop | success
+  until: _stop  is success
   retries: 5
   delay: 2
   listen: "Restart zun services"
@@ -34,7 +34,7 @@
     daemon_reload: yes
   with_items: "{{ filtered_zun_services }}"
   register: _start
-  until: _start | success
+  until: _start  is success
   retries: 5
   delay: 2
   listen: "Restart zun services"
@@ -49,7 +49,7 @@
     - docker
     - kuryr-libnetwork
   register: _stop
-  until: _stop | success
+  until: _stop  is success
   retries: 5
   delay: 2
   listen: "Restart kuryr services"
@@ -64,7 +64,7 @@
     - docker
     - kuryr-libnetwork
   register: _start
-  until: _start | success
+  until: _start  is success
   retries: 5
   delay: 2
   listen: "Restart kuryr services"

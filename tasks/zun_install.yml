@@ -56,7 +56,7 @@
     path: "{{ zun_bin | dirname }}"
     state: absent
   when:
-    - zun_get_venv | changed
+    - zun_get_venv  is changed
 
 - name: Create zun venv dir
   file:
@@ -64,7 +64,7 @@
     state: directory
   register: zun_venv_dir
   when:
-    - zun_get_venv | changed
+    - zun_get_venv  is changed
 
 - name: Unarchive pre-built venv
   unarchive:
@@ -72,7 +72,7 @@
     dest: "{{ zun_bin | dirname }}"
     copy: "no"
   when:
-    - zun_get_venv | changed
+    - zun_get_venv  is changed
   notify:
     - Manage LB
     - Restart zun services
@@ -88,7 +88,7 @@
       {{ (pip_install_upper_constraints is defined) | ternary('--constraint ' + pip_install_upper_constraints | default(''),'') }}
       {{ pip_install_options | default('') }}
   register: install_packages
-  until: install_packages|success
+  until: install_packages is success
   retries: 5
   delay: 2
   when:
@@ -105,7 +105,7 @@
     state: "absent"
   when:
     - ansible_pkg_mgr in ['yum', 'dnf', 'zypper']
-    - zun_get_venv | changed
+    - zun_get_venv  is changed
 
 # NOTE(odyssey4me):
 # We reinitialize the venv to ensure that the right
@@ -124,7 +124,7 @@
         --no-setuptools \
         --no-wheel
   when:
-    - zun_get_venv | changed
+    - zun_get_venv  is changed
   tags:
     - skip_ansible_lint
 
