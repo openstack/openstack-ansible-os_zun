@@ -15,7 +15,11 @@
 
 - name: Installation and setup of Zun
   hosts: zun_all
+  gather_facts: true
+  any_errors_fatal: true
   remote_user: root
+  vars_files:
+    - common/test-vars.yml
   roles:
     - role: "os_zun"
       zun_rabbitmq_password: secrete
