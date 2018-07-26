@@ -120,19 +120,24 @@ zun_rpc_thread_pool_size: 64
 zun_rpc_conn_pool_size: 30
 zun_rpc_response_timeout: 60
 
-zun_rabbitmq_servers: 127.0.0.1
-zun_rabbitmq_port: 5672
-zun_rabbitmq_userid: zun
-zun_rabbitmq_vhost: /zun
-zun_rabbitmq_use_ssl: False
+## Oslo Messaging info
 
-## Configuration for notifications communication, i.e. [oslo_messaging_notifications]
-zun_rabbitmq_telemetry_userid: "{{ zun_rabbitmq_userid }}"
-zun_rabbitmq_telemetry_password: "{{ zun_rabbitmq_password }}"
-zun_rabbitmq_telemetry_vhost: "{{ zun_rabbitmq_vhost }}"
-zun_rabbitmq_telemetry_port: "{{ zun_rabbitmq_port }}"
-zun_rabbitmq_telemetry_servers: "{{ zun_rabbitmq_servers }}"
-zun_rabbitmq_telemetry_use_ssl: "{{ zun_rabbitmq_use_ssl }}"
+# RPC
+zun_oslomsg_rpc_transport: rabbit
+zun_oslomsg_rpc_servers: 127.0.0.1
+zun_oslomsg_rpc_port: 5672
+zun_oslomsg_rpc_use_ssl: False
+zun_oslomsg_rpc_userid: zun
+zun_oslomsg_rpc_vhost: /zun
+
+# Notify
+zun_oslomsg_notify_transport: rabbit
+zun_oslomsg_notify_servers: 127.0.0.1
+zun_oslomsg_notify_port: 5672
+zun_oslomsg_notify_use_ssl: False
+zun_oslomsg_notify_userid: "{{ zun_oslomsg_rpc_userid }}"
+zun_oslomsg_notify_password: "{{ zun_oslomsg_rpc_password }}"
+zun_oslomsg_notify_vhost: "{{ zun_oslomsg_rpc_vhost }}"
 
 # If this is not set, then the playbook will try to guess it.
 #zun_virt_type: kvm
@@ -237,6 +242,13 @@ zun_pip_packages:
   - python-zunclient
   - pymysql
   - zun
+
+## (Qdrouterd) integration
+# TODO(ansmith): Change structure when more backends will be supported
+zun_oslomsg_amqp1_enabled: "{{ zun_oslomsg_rpc_transport == 'amqp' }}"
+
+zun_optional_oslomsg_amqp1_pip_packages:
+  - oslo.messaging[amqp1]
 
 ## Default service options used within all systemd unit files.
 zun_service_defaults: {}

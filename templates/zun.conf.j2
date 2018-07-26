@@ -290,7 +290,7 @@ rpc_conn_pool_size = {{ zun_rpc_conn_pool_size }}
 # oslo_messaging.TransportURL at
 # https://docs.openstack.org/oslo.messaging/latest/reference/transport.html
 # (string value)
-transport_url = rabbit://{% for host in zun_rabbitmq_servers.split(',') %}{{ zun_rabbitmq_userid }}:{{ zun_rabbitmq_password }}@{{ host }}:{{ zun_rabbitmq_port }}{% if not loop.last %},{% else %}/{{ zun_rabbitmq_vhost }}{% endif %}{% endfor %}
+transport_url = {{ zun_oslomsg_rpc_transport }}://{% for host in zun_oslomsg_rpc_servers.split(',') %}{{ zun_oslomsg_rpc_userid }}:{{ zun_oslomsg_rpc_password }}@{{ host }}:{{ zun_oslomsg_rpc_port }}{% if not loop.last %},{% else %}/{{ zun_oslomsg_rpc_vhost }}{% if (zun_oslomsg_rpc_use_ssl | lower) | bool %}?ssl=1{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
 
 # DEPRECATED: The messaging driver to use, defaults to rabbit. Other drivers
 # include amqp and zmq. (string value)
@@ -1603,7 +1603,7 @@ driver = messagingv2
 # we fall back to the same configuration used for RPC. (string value)
 # Deprecated group/name - [DEFAULT]/notification_transport_url
 #transport_url = <None>
-transport_url = rabbit://{% for host in zun_rabbitmq_telemetry_servers.split(',') %}{{ zun_rabbitmq_telemetry_userid }}:{{ zun_rabbitmq_telemetry_password }}@{{ host }}:{{ zun_rabbitmq_telemetry_port }}{% if not loop.last %},{% else %}/{{ zun_rabbitmq_telemetry_vhost }}{% endif %}{% endfor %}
+transport_url = {{ zun_oslomsg_notify_transport }}://{% for host in zun_oslomsg_notify_servers.split(',') %}{{ zun_oslomsg_notify_userid }}:{{ zun_oslomsg_notify_password }}@{{ host }}:{{ zun_oslomsg_notify_port }}{% if not loop.last %},{% else %}/{{ zun_oslomsg_notify_vhost }}{% if (zun_oslomsg_notify_use_ssl | lower) | bool %}?ssl=1{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
 
 # AMQP topic used for OpenStack notifications. (list value)
 # Deprecated group/name - [rpc_notifier2]/topics
@@ -1643,7 +1643,7 @@ topics = {{ notification_topics | join(',') }}
 # Connect over SSL. (boolean value)
 # Deprecated group/name - [oslo_messaging_rabbit]/rabbit_use_ssl
 #ssl = false
-ssl = {{ zun_rabbitmq_use_ssl }}
+ssl = {{ zun_oslomsg_notify_use_ssl | bool }}
 
 # SSL version to use (valid only if SSL enabled). Valid values are TLSv1 and
 # SSLv23. SSLv2, SSLv3, TLSv1_1, and TLSv1_2 may be available on some
