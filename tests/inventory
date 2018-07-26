@@ -2,6 +2,7 @@
 localhost
 infra1
 openstack1
+compute1
 
 [all_containers]
 infra1
@@ -76,7 +77,7 @@ neutron_server
 openstack1
 
 [zun_compute]
-localhost
+compute1
 
 [zun_all:children]
 zun_api

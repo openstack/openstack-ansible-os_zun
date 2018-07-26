@@ -15,7 +15,7 @@
 
 - name: Create a zun image
   hosts: zun_compute
-  become: true
+  remote_user: root
   tasks:
     - name: Pull cirros image
       command: docker pull cirros
@@ -33,7 +33,7 @@
 
 - name: Run zun service check
   hosts: zun_api[0]
-  become: true
+  remote_user: root
   tasks:
     - name: Check zun service is functional
       shell: |
