@@ -16,35 +16,45 @@
 - name: Create a zun image
   hosts: zun_compute
   remote_user: root
+  gather_facts: true
+  any_errors_fatal: true
+  vars_files:
+    - common/test-vars.yml
   tasks:
     - name: Pull cirros image
       command: docker pull cirros
       # TODO(cloudnull): Set up failed_when and changed_when conditions
-      tags:
-        - skip_ansible_lint
+      changed_when: false
+
+    - name: Ensure the clouds.yaml file is present
+      include_role:
+        name: openstack_openrc
 
     - name: Upload image into glance
       shell: |
-        . /root/openrc
-        docker save cirros | /openstack/venvs/zun-untagged/bin/openstack image create zun-cirros --public --container-format docker --disk-format raw
+        docker save cirros | /openstack/venvs/zun-untagged/bin/openstack --os-cloud default image create zun-cirros --public --container-format docker --disk-format raw
       # TODO(cloudnull): Set up failed_when and changed_when conditions
-      tags:
-        - skip_ansible_lint
+      changed_when: false
 
 - name: Run zun service check
   hosts: zun_api[0]
   remote_user: root
+  gather_facts: true
+  any_errors_fatal: true
+  vars_files:
+    - common/test-vars.yml
   tasks:
+    - name: Ensure the clouds.yaml file is present
+      include_role:
+        name: openstack_openrc
+
     - name: Check zun service is functional
-      shell: |
-        . /root/openrc
-        /openstack/venvs/zun-untagged/bin/openstack appcontainer service list
+      command: |
+        /openstack/venvs/zun-untagged/bin/openstack --os-cloud default appcontainer service list
       changed_when: false
 
     - name: Create zun container
-      shell: |
-        . /root/openrc
-        /openstack/venvs/zun-untagged/bin/openstack appcontainer run --name container-check --net network=private zun-cirros ping 127.0.0.1
+      command: |
+        /openstack/venvs/zun-untagged/bin/openstack --os-cloud default appcontainer run --name container-check --net network=private zun-cirros ping 127.0.0.1
       # TODO(cloudnull): Set up failed_when and changed_when conditions
-      tags:
-        - skip_ansible_lint
+      changed_when: false
