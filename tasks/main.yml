@@ -36,30 +36,42 @@
   tags:
     - zun-install
 
-- include_tasks: zun_db_setup.yml
+- include_tasks: mq_setup.yml
   when:
-    - zun_services['zun-api']['group'] in group_names
-    - inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]
+    - "zun_services['zun-api']['group'] in group_names"
+    - "inventory_hostname == ((groups[zun_services['zun-api']['group']] | intersect(ansible_play_hosts)) | list)[0]"
+  with_items:
+    - oslomsg_setup_host: "{{ zun_oslomsg_rpc_setup_host }}"
+      oslomsg_userid: "{{ zun_oslomsg_rpc_userid }}"
+      oslomsg_password: "{{ zun_oslomsg_rpc_password }}"
+      oslomsg_vhost: "{{ zun_oslomsg_rpc_vhost }}"
+      oslomsg_transport: "{{ zun_oslomsg_rpc_transport }}"
+    - oslomsg_setup_host: "{{ zun_oslomsg_notify_setup_host }}"
+      oslomsg_userid: "{{ zun_oslomsg_notify_userid }}"
+      oslomsg_password: "{{ zun_oslomsg_notify_password }}"
+      oslomsg_vhost: "{{ zun_oslomsg_notify_vhost }}"
+      oslomsg_transport: "{{ zun_oslomsg_notify_transport }}"
+  no_log: true
   tags:
     - zun-config
 
-- include_tasks: zun_amqp_setup.yml
+- include_tasks: zun_db_setup.yml
   when:
-    - zun_services['zun-api']['group'] in group_names
-    - inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]
+    - "zun_services['zun-api']['group'] in group_names"
+    - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
     - zun-config
 
 - include_tasks: zun_service_setup.yml
   when:
-    - zun_services['zun-api']['group'] in group_names
-    - inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]
+    - "zun_services['zun-api']['group'] in group_names"
+    - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
     - zun-config
 
 - include_tasks: zun_compute.yml
   when:
-    - zun_services['zun-compute']['group'] in group_names
+    - "zun_services['zun-compute']['group'] in group_names"
   tags:
     - zun-compute
 
