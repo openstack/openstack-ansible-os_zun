@@ -203,9 +203,7 @@ zun_service_in_ldap: false
 zun_scheduler_default_filters: >-
   AvailabilityZoneFilter,
   CPUFilter,
-  RamFilter,
-  ComputeFilter,
-  DiskFilter
+  ComputeFilter
 zun_scheduler_available_filters: zun.scheduler.filters.all_filters
 zun_scheduler_driver: filter_scheduler
 
