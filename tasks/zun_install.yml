@@ -13,13 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Install distro packages
-  package:
-    name: "{{ zun_distro_packages }}"
-    state: "{{ zun_package_state }}"
-    update_cache: "{{ (ansible_pkg_mgr in ['apt', 'zypper']) | ternary('yes', omit) }}"
-    cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
-
+# TODO(odyssey4me):
+# This can be simplified once all the roles are using
+# python_venv_build. We can then switch to using a
+# set of constraints in pip.conf inside the venv,
+# perhaps prepared by giving a giving a list of
+# constraints to the role.
 - name: Create developer mode constraint file
   copy:
     dest: "/opt/developer-pip-constraints.txt"
@@ -30,143 +29,22 @@
   when:
     - zun_developer_mode | bool
 
-- name: Retrieve checksum for venv download
-  uri:
-    url: "{{ zun_venv_download_url | replace('tgz', 'checksum') }}"
-    return_content: yes
-  register: zun_venv_checksum
+- name: Ensure remote wheel building is disabled in developer mode
+  set_fact:
+    venv_build_host: "{{ ansible_hostname }}"
   when:
-    - zun_venv_download | bool
-  tags:
-    - always
+    - zun_developer_mode | bool
 
-- name: Attempt venv download
-  get_url:
-    url: "{{ zun_venv_download_url }}"
-    dest: "/var/cache/{{ zun_venv_download_url | basename }}"
-    checksum: "sha1:{{ zun_venv_checksum.content | trim }}"
-  register: zun_get_venv
-  when:
-    - zun_venv_download | bool
-  tags:
-    - always
-
-- name: Remove existing venv
-  file:
-    path: "{{ zun_bin | dirname }}"
-    state: absent
-  when:
-    - zun_get_venv  is changed
-
-- name: Create zun venv dir
-  file:
-    path: "{{ zun_bin | dirname }}"
-    state: directory
-  register: zun_venv_dir
-  when:
-    - zun_get_venv  is changed
-
-- name: Unarchive pre-built venv
-  unarchive:
-    src: "/var/cache/{{ zun_venv_download_url | basename }}"
-    dest: "{{ zun_bin | dirname }}"
-    copy: "no"
-  when:
-    - zun_get_venv  is changed
-  notify:
-    - Manage LB
-    - Restart zun services
-
-- name: Install pip packages
-  pip:
-    name: "{{ zun_pip_packages }}"
-    state: "{{ zun_pip_package_state }}"
-    virtualenv: "{{ zun_bin | dirname }}"
-    virtualenv_site_packages: "no"
-    extra_args: >-
-      {{ zun_developer_mode | ternary(pip_install_developer_constraints | default('--constraint /opt/developer-pip-constraints.txt'), '') }}
-      {{ (pip_install_upper_constraints is defined) | ternary('--constraint ' + pip_install_upper_constraints | default(''),'') }}
-      {{ pip_install_options | default('') }}
-  register: install_packages
-  until: install_packages is success
-  retries: 5
-  delay: 2
-  when:
-    - zun_get_venv | failed or zun_get_venv | skipped
-  notify:
-    - Manage LB
-    - Restart zun services
-  tags:
-    - zun-pip-packages
-
-- name: Install optional pip packages
-  pip:
-    name: "{{ zun_optional_oslomsg_amqp1_pip_packages }}"
-    state: "{{ zun_pip_package_state }}"
-    virtualenv: "{{ zun_bin | dirname }}"
-    virtualenv_site_packages: "no"
-  when: zun_oslomsg_amqp1_enabled
-  register: install_optional_packages
-  until: install_optional_packages is success
-  retries: 5
-  delay: 2
-  notify:
-    - Manage LB
-    - Restart zun services
-  tags:
-    - zun-pip-packages
-
-- name: Remove python from path first (CentOS, openSUSE)
-  file:
-    path:  "{{ zun_bin | dirname }}/bin/python2.7"
-    state: "absent"
-  when:
-    - ansible_pkg_mgr in ['yum', 'dnf', 'zypper']
-    - zun_get_venv  is changed
-
-# NOTE(odyssey4me):
-# We reinitialize the venv to ensure that the right
-# version of python is in the venv, but we do not
-# want virtualenv to also replace pip, setuptools
-# and wheel so we tell it not to.
-# We do not use --always-copy for CentOS/SuSE due
-# to https://github.com/pypa/virtualenv/issues/565
-- name: Update virtualenv path
-  shell: |
-    find {{ zun_bin }} -name \*.pyc -delete
-    sed -si '1s/^.*python.*$/#!{{ zun_bin | replace ('/','\/') }}\/python/' {{ zun_bin }}/*
-    virtualenv {{ zun_bin | dirname }} \
-        {{ (ansible_pkg_mgr == 'apt') | ternary('--always-copy', '') }} \
-        --no-pip \
-        --no-setuptools \
-        --no-wheel
-  when:
-    - zun_get_venv  is changed
-  tags:
-    - skip_ansible_lint
-
-- name: Initialise the upgrade facts
-  ini_file:
-    dest: "/etc/ansible/facts.d/openstack_ansible.fact"
-    section: zun
-    option: "{{ item }}"
-    value: True
-  with_items:
-    - "need_service_restart"
-    - "need_online_data_migrations"
-  when:
-    - (zun_get_venv | changed) or
-      (zun_venv_dir | changed) or
-      (install_packages | changed) or
-      (ansible_local is not defined) or
-      ('openstack_ansible' not in ansible_local) or
-      ('zun' not in ansible_local['openstack_ansible']) or
-      ('need_online_data_migrations' not in ansible_local['openstack_ansible']['zun']) or
-      ('need_service_restart' not in ansible_local['openstack_ansible']['zun'])
-
-- name: Record the venv tag deployed
-  ini_file:
-    dest: "/etc/ansible/facts.d/openstack_ansible.fact"
-    section: zun
-    option: venv_tag
-    value: "{{ zun_venv_tag }}"
+- name: Install the python venv
+  include_role:
+    name: "python_venv_build"
+    private: yes
+  vars:
+    venv_install_destination_path: "{{ zun_bin | dirname }}"
+    venv_install_distro_package_list: "{{ zun_distro_packages }}"
+    venv_pip_install_args: "{{ zun_pip_install_args }}"
+    venv_pip_packages: "{{ (zun_oslomsg_amqp1_enabled | bool) | ternary(zun_pip_packages + zun_optional_oslomsg_amqp1_pip_packages, zun_pip_packages) }}"
+    venv_facts_when_changed:
+      - section: "zun"
+        option: "venv_tag"
+        value: "{{ zun_venv_tag }}"

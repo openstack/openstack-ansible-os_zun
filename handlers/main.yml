@@ -24,7 +24,9 @@
   until: _stop is success
   retries: 5
   delay: 2
-  listen: "Restart zun services"
+  listen:
+    - "Restart zun services"
+    - "venv changed"
 
 - name: Start services
   systemd:
@@ -37,7 +39,9 @@
   until: _start is success
   retries: 5
   delay: 2
-  listen: "Restart zun services"
+  listen:
+    - "Restart zun services"
+    - "venv changed"
 
 - name: Stop docker
   systemd:
