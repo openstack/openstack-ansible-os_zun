@@ -1742,12 +1742,6 @@ ssl = {{ zun_oslomsg_notify_use_ssl | bool }}
 # (integer value)
 #rabbit_interval_max = 30
 
-# DEPRECATED: Maximum number of RabbitMQ connection retries. Default is 0
-# (infinite retry count). (integer value)
-# This option is deprecated for removal.
-# Its value may be silently ignored in the future.
-#rabbit_max_retries = 0
-
 # Try to use HA queues in RabbitMQ (x-ha-policy: all). If you change this
 # option, you must wipe the RabbitMQ database. In RabbitMQ 3.0, queue mirroring
 # is no longer controlled by the x-ha-policy argument when declaring a queue.
