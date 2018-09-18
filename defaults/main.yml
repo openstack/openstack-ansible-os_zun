@@ -37,10 +37,10 @@ zun_package_state: "latest"
 zun_pip_package_state: "latest"
 
 zun_git_repo: https://git.openstack.org/openstack/zun
-zun_git_install_branch: master
+zun_git_install_branch: 'stable/rocky'
 
 zun_kuryr_git_repo: https://git.openstack.org/openstack/kuryr-libnetwork
-zun_kuryr_git_install_branch: master
+zun_kuryr_git_install_branch: 'stable/rocky'
 
 zun_developer_mode: false
 zun_developer_constraints:

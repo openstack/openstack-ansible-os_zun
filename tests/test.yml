@@ -38,7 +38,7 @@
     tempest_plugins:
       - name: zun-tempest-plugin
         repo: git://git.openstack.org/openstack/zun-tempest-plugin
-        branch: master
+        branch: 14ed11c72043a95fe15f0f89f200ae5188f653eb
 
 # Run some additional tests with Zun to validate everything is working
 - import_playbook: test-zun-check.yml
