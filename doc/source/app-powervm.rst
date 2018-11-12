@@ -38,7 +38,7 @@ detect the appropriate compute node type.
 The full set of configuration options for the PowerVM driver can be
 found in the ``zun-powervm`` usage_.
 
-.. _usage: http://zun-powervm.readthedocs.io/en/latest/devref/usage.html
+.. _usage: https://zun-powervm.readthedocs.io/en/latest/devref/usage.html
 
 
 Configuring storage
