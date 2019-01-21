@@ -16,14 +16,17 @@
 - name: Define the docker api
   block:
     - name: Get docker api version
-      command: "docker version"
+      command: >-
+        {% raw %}
+        docker version -f "{{.Client.APIVersion }}"
+        {% endraw %}
       failed_when: false
       changed_when: false
       register: docker_version
 
     - name: Set docker api version fact
       set_fact:
-        zun_docker_api_version: "{{ (docker_version.stdout | from_yaml)['Client']['API version'] }}"
+        zun_docker_api_version: "{{ docker_version.stdout | trim }}"
   when:
     - zun_services['zun-compute']['group'] in group_names
 
