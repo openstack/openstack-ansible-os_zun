@@ -16,7 +16,6 @@
 - name: Run the galera client role
   include_role:
     name: galera_client
-    private: true
 
 - name: Create DB for service
   mysql_db:
