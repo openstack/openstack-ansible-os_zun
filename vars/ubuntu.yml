@@ -29,5 +29,7 @@ zun_distro_compute_packages:
   - docker-ce
   - pciutils
 
+zun_docker_groupname: docker
+
 ## APT Cache options
 cache_timeout: 600

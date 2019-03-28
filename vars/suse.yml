@@ -27,3 +27,5 @@ zun_distro_packages:
 zun_distro_compute_packages:
   - docker-ce
   - pciutils
+
+zun_docker_groupname: dockerroot

@@ -26,7 +26,6 @@
       zun_galera_password: secrete
       zun_service_password: secrete
       zun_kuryr_service_password: secrete
-      zun_developer_mode: true
       zun_service_publicuri: "http://{{ hostvars[groups['keystone_all'][0]]['ansible_host'] }}:9517"
       zun_service_adminuri: "http://{{ hostvars[groups['keystone_all'][0]]['ansible_host'] }}:9517"
       zun_service_internaluri: "http://{{ hostvars[groups['keystone_all'][0]]['ansible_host'] }}:9517"

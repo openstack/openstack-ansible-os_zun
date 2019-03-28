@@ -43,30 +43,17 @@ zun_git_install_branch: master
 zun_kuryr_git_repo: https://git.openstack.org/openstack/kuryr-libnetwork
 zun_kuryr_git_install_branch: master
 
-zun_developer_mode: false
-zun_developer_constraints:
+zun_upper_constraints_url: "{{ requirements_git_url | default('https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt?h=' ~ requirements_git_install_branch | default('master')) }}"
+zun_git_constraints:
   - "git+{{ zun_git_repo }}@{{ zun_git_install_branch }}#egg=zun"
   - "git+{{ zun_kuryr_git_repo }}@{{ zun_kuryr_git_install_branch }}#egg=kuryr-libnetwork"
+  - "--constraint {{ zun_upper_constraints_url }}"
 
-# TODO(odyssey4me):
-# This can be simplified once all the roles are using
-# python_venv_build. We can then switch to using a
-# set of constraints in pip.conf inside the venv,
-# perhaps prepared by giving a giving a list of
-# constraints to the role.
-zun_pip_install_args: >-
-  {{ zun_developer_mode | ternary(pip_install_developer_constraints | default('--constraint /opt/developer-pip-constraints.txt'), '') }}
-  {{ (pip_install_upper_constraints is defined) | ternary('--constraint ' + pip_install_upper_constraints | default(''), '') }}
-  {{ pip_install_options | default('') }}
+zun_pip_install_args: "{{ pip_install_options | default('') }}"
 
 # Name of the virtual env to deploy into
 zun_venv_tag: "{{ venv_tag | default('untagged') }}"
 zun_bin: "/openstack/venvs/zun-{{ zun_venv_tag }}/bin"
-
-# venv_download, even when true, will use the fallback method of building the
-# venv from scratch if the venv download fails.
-zun_venv_download: "{{ not zun_developer_mode | bool }}"
-zun_venv_download_url: http://127.0.0.1/venvs/untagged/ubuntu/zun.tgz
 
 zun_fatal_deprecations: False
 

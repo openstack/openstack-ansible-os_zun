@@ -193,7 +193,7 @@
 - name: Ensure docker users are added to the docker group
   user:
     name: "{{ item }}"
-    group: docker
+    group: "{{ zun_docker_groupname }}"
     append: yes
   with_items: "{{ zun_docker_users }}"
 

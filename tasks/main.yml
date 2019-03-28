@@ -24,15 +24,27 @@
   tags:
     - always
 
-- include_tasks: zun_pre_flight.yml
+- import_tasks: zun_pre_flight.yml
   tags:
     - always
 
-- include_tasks: zun_pre_install.yml
+- import_tasks: zun_pre_install.yml
   tags:
     - zun-install
 
-- include_tasks: zun_install.yml
+- name: Install the python venv
+  include_role:
+    name: "python_venv_build"
+  vars:
+    venv_build_constraints: "{{ zun_git_constraints }}"
+    venv_install_destination_path: "{{ zun_bin | dirname }}"
+    venv_install_distro_package_list: "{{ zun_distro_packages }}"
+    venv_pip_install_args: "{{ zun_pip_install_args }}"
+    venv_pip_packages: "{{ zun_pip_packages | union((zun_oslomsg_amqp1_enabled | bool) | ternary(zun_optional_oslomsg_amqp1_pip_packages, [])) }}"
+    venv_facts_when_changed:
+      - section: "zun"
+        option: "venv_tag"
+        value: "{{ zun_venv_tag }}"
   tags:
     - zun-install
 
@@ -56,27 +68,27 @@
     - common-mq
     - zun-config
 
-- include_tasks: zun_db_setup.yml
+- import_tasks: zun_db_setup.yml
   when:
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
     - zun-config
 
-- include_tasks: zun_service_setup.yml
+- import_tasks: zun_service_setup.yml
   when:
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
     - zun-config
 
-- include_tasks: zun_compute.yml
+- import_tasks: zun_compute.yml
   when:
     - "zun_services['zun-compute']['group'] in group_names"
   tags:
     - zun-compute
 
-- include_tasks: zun_post_install.yml
+- import_tasks: zun_post_install.yml
   tags:
     - zun-config
 
@@ -108,7 +120,7 @@
     - systemd-service
 
 - name: Run the etcd service role
-  include_role:
+  import_role:
     name: etcd
   vars:
     etcd_cluster_group: "zun_api"
