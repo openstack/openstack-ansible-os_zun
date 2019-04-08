@@ -15,7 +15,7 @@
 
 zun_docker_repo:
   - name: "docker-ce"
-    uri: "https://download.docker.com/linux/ubuntu"
+    uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
     gpg_uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
 
 # Common apt packages
