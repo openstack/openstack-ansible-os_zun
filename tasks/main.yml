@@ -33,7 +33,7 @@
     - zun-install
 
 - name: Install the python venv
-  include_role:
+  import_role:
     name: "python_venv_build"
   vars:
     venv_build_constraints: "{{ zun_git_constraints }}"
@@ -93,7 +93,7 @@
     - zun-config
 
 - name: Run the systemd service role
-  include_role:
+  import_role:
     name: systemd_service
   vars:
     systemd_user_name: "{{ zun_system_user_name }}"
@@ -105,16 +105,7 @@
     systemd_BlockIOAccounting: true
     systemd_MemoryAccounting: true
     systemd_TasksAccounting: true
-    systemd_services:
-      - service_name: "{{ service_var.service_name }}"
-        enabled: yes
-        state: started
-        execstarts: "{{ service_var.execstarts }}"
-        execreloads: "{{ service_var.execreloads | default([]) }}"
-        config_overrides: "{{ zun_service_defaults | combine(service_var.init_config_overrides) }}"
-  with_items: "{{ filtered_zun_services }}"
-  loop_control:
-    loop_var: service_var
+    systemd_services: "{{ filtered_zun_services }}"
   tags:
     - zun-config
     - systemd-service
