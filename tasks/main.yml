@@ -68,11 +68,19 @@
     - common-mq
     - zun-config
 
-- import_tasks: zun_db_setup.yml
+- import_tasks: db_setup.yml
+  vars:
+    _oslodb_setup_host: "{{ zun_db_setup_host }}"
+    _oslodb_databases:
+      - name: "{{ zun_galera_database }}"
+        users:
+          - username: "{{ zun_galera_user }}"
+            password: "{{ zun_galera_password }}"
   when:
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
+    - common-db
     - zun-config
 
 - import_tasks: zun_service_setup.yml
