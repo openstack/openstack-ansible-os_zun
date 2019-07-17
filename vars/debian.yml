@@ -23,6 +23,7 @@ zun_distro_packages:
   - ca-certificates
   - curl
   - git
+  - libsystemd-dev
   - software-properties-common
 
 zun_distro_compute_packages:

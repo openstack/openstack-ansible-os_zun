@@ -20,6 +20,7 @@ zun_docker_repo:
 # Common yum packages
 zun_distro_packages:
   - git
+  - systemd-devel
 
 zun_distro_compute_packages:
   - docker

@@ -23,6 +23,7 @@ zun_distro_packages:
   - git
   - yum-utils
   - lvm2
+  - systemd-devel
 
 zun_distro_compute_packages:
   - docker-ce

@@ -74,34 +74,6 @@
   tags:
     - zun-dirs
 
-- name: Test for log directory or link
-  shell: |
-    if [ -h "{{ zun_log_dir }}"  ]; then
-      chown -h {{ zun_system_user_name }}:{{ zun_system_group_name }} "{{ zun_log_dir }}"
-      chown -R {{ zun_system_user_name }}:{{ zun_system_group_name }} "$(readlink {{ zun_log_dir }})"
-    else
-      exit 1
-    fi
-  register: log_dir
-  failed_when: false
-  changed_when: false
-  tags:
-    - zun-dirs
-    - zun-logs
-
-- name: Create zun log dir
-  file:
-    path: "{{ zun_log_dir }}"
-    state: directory
-    owner: "{{ zun_system_user_name }}"
-    group: "{{ zun_system_group_name }}"
-    mode: "0755"
-  when:
-    - log_dir.rc != 0
-  tags:
-    - zun-dirs
-    - zun-logs
-
 - name: Drop sudoers file
   template:
     src: "sudoers.j2"

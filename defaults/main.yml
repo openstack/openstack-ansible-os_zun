@@ -242,6 +242,7 @@ zun_pip_packages:
   - python-memcached
   - python-zunclient
   - pymysql
+  - systemd-python
   - zun
 
 ## (Qdrouterd) integration
