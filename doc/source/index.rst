@@ -1,5 +1,5 @@
 ===============================
-Nova role for OpenStack-Ansible
+Zun role for OpenStack-Ansible
 ===============================
 
 .. toctree::
