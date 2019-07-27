@@ -1,5 +1,3 @@
-`Home <index.html>`_ OpenStack-Ansible Neutron
-
 =====================================
 Scenario - Using PowerVM Nova plugin
 =====================================
