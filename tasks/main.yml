@@ -83,7 +83,35 @@
     - common-db
     - zun-config
 
-- import_tasks: zun_service_setup.yml
+- import_tasks: service_setup.yml
+  vars:
+    _service_adminuri_insecure: "{{ keystone_service_adminuri_insecure }}"
+    _service_in_ldap: "{{ zun_service_in_ldap }}"
+    _service_setup_host: "{{ zun_service_setup_host }}"
+    _service_setup_host_python_interpreter: "{{ zun_service_setup_host_python_interpreter }}"
+    _service_project_name: "{{ zun_service_project_name }}"
+    _service_region: "{{ zun_service_region }}"
+    _service_users:
+      - name: "{{ zun_service_user_name }}"
+        password: "{{ zun_service_password }}"
+        role: "{{ zun_service_role_name }}"
+      - name: "{{ zun_kuryr_service_username }}"
+        password: "{{ zun_kuryr_service_password }}"
+        role: "{{ zun_service_role_name }}"
+    _service_endpoints:
+      - service: "{{ zun_service_name }}"
+        interface: "public"
+        url: "{{ zun_service_publicurl }}"
+      - service: "{{ zun_service_name }}"
+        interface: "internal"
+        url: "{{ zun_service_internalurl }}"
+      - service: "{{ zun_service_name }}"
+        interface: "admin"
+        url: "{{ zun_service_adminurl }}"
+    _service_catalog:
+      - name: "{{ zun_service_name }}"
+        type: "{{ zun_service_type }}"
+        description: "{{ zun_service_description }}"
   when:
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
