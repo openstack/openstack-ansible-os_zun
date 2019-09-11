@@ -36,6 +36,7 @@
   import_role:
     name: "python_venv_build"
   vars:
+    venv_python_executable: "{{ zun_venv_python_executable }}"
     venv_build_constraints: "{{ zun_git_constraints }}"
     venv_install_destination_path: "{{ zun_bin | dirname }}"
     venv_install_distro_package_list: "{{ zun_distro_packages }}"
