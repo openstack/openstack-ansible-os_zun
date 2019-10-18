@@ -26,6 +26,9 @@
 # Install Glance
 - import_playbook: common/test-install-glance.yml
 
+# Install Placement
+- import_playbook: test-install-placement.yml
+
 # Install Neutron
 - import_playbook: common/test-install-neutron.yml
 
