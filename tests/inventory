@@ -79,6 +79,12 @@ neutron_lbaas_agent
 neutron_metadata_agent
 neutron_server
 
+[placement_all:children]
+placement_api
+
+[placement_api]
+openstack1
+
 [zun_api]
 openstack1
 
