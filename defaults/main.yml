@@ -169,7 +169,10 @@ zun_service_proto: http
 zun_service_publicuri_proto: "{{ openstack_service_publicuri_proto | default(zun_service_proto) }}"
 zun_service_adminuri_proto: "{{ openstack_service_adminuri_proto | default(zun_service_proto) }}"
 zun_service_internaluri_proto: "{{ openstack_service_internaluri_proto | default(zun_service_proto) }}"
+zun_service_address: "{{ openstack_service_bind_address | default('0.0.0.0') }}"
 zun_service_port: 9517
+zun_kuryr_service_address: 127.0.0.1
+zun_kuryr_service_port: 23750
 zun_service_description: "Zun Compute Service"
 zun_service_publicuri: "{{ zun_service_publicuri_proto }}://{{ external_lb_vip_address }}:{{ zun_service_port }}"
 zun_service_publicurl: "{{ zun_service_publicuri }}"
@@ -209,6 +212,11 @@ zun_scheduler_default_filters: >-
 zun_scheduler_available_filters: zun.scheduler.filters.all_filters
 zun_scheduler_driver: filter_scheduler
 
+## uWSGI setup
+zun_wsgi_threads: 1
+zun_wsgi_processes_max: 16
+zun_wsgi_processes: "{{ [[ansible_processor_vcpus|default(1), 1] | max * 2, zun_wsgi_processes_max] | min }}"
+
 ## Service Name-Group Mapping
 zun_services:
   kuryr-libnetwork:
@@ -217,13 +225,25 @@ zun_services:
     condition: "{{ inventory_hostname in groups['zun_compute'] }}"
     init_config_overrides: "{{ zun_kuryr_init_overrides }}"
     start_order: 3
-    execstarts: "{{ zun_bin }}/kuryr-server --config-dir /etc/kuryr"
+    wsgi_app: True
+    wsgi: kuryr_libnetwork.server:app
+    uwsgi_bind_address: "{{ zun_kuryr_service_address }}"
+    uwsgi_port: "{{ zun_kuryr_service_port }}"
+    uwsgi_overrides: "{{ zun_kuryr_uwsgi_conf_overrides }}"
+    uwsgi_uid: "{{ zun_kuryr_system_user_name }}"
+    uwsgi_guid: "{{ zun_kuryr_system_group_name }}"
   zun-api:
     group: zun_api
     service_name: zun-api
     init_config_overrides: "{{ zun_api_init_overrides }}"
     start_order: 1
-    execstarts: "{{ zun_bin }}/zun-api --config-dir /etc/zun"
+    wsgi_app: True
+    wsgi_path: "{{ zun_bin }}/zun-api-wsgi"
+    uwsgi_bind_address: "{{ zun_service_address }}"
+    uwsgi_port: "{{ zun_service_port }}"
+    uwsgi_overrides: "{{ zun_uwsgi_conf_overrides }}"
+    uwsgi_uid: "{{ zun_system_user_name }}"
+    uwsgi_guid: "{{ zun_system_group_name }}"
   zun-compute:
     group: zun_compute
     service_name: zun-compute
@@ -264,6 +284,10 @@ zun_rootwrap_conf_overrides: {}
 zun_kuryr_conf_overrides: {}
 zun_docker_config_overrides: {}
 zun_kuryr_config_overrides: {}
+zun_uwsgi_conf_overrides: {}
+zun_kuryr_uwsgi_conf_overrides:
+  uwsgi:
+    pyargv: --config-file /etc/kuryr/kuryr.conf
 
 ## Tubnable overrides for service unit files.
 zun_api_paste_ini_overrides: {}

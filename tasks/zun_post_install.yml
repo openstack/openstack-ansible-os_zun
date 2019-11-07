@@ -54,6 +54,7 @@
       config_type: "ini"
   notify:
     - Manage LB
+    - Restart uwsgi services
     - Restart zun services
   tags:
     - zun-config

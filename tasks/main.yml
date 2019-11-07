@@ -129,6 +129,16 @@
   tags:
     - zun-config
 
+- name: Import uwsgi role
+  import_role:
+    name: uwsgi
+  vars:
+    uwsgi_services: "{{ uwsgi_zun_services }}"
+    uwsgi_install_method: "source"
+  tags:
+    - zun-config
+    - uwsgi
+
 - name: Run the systemd service role
   import_role:
     name: systemd_service
