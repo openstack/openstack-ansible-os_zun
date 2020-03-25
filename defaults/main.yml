@@ -263,6 +263,7 @@ zun_pip_packages:
   - oslo_rootwrap
   - osprofiler
   - python-memcached
+  - pymemcache
   - python-zunclient
   - pymysql
   - systemd-python
@@ -271,6 +272,8 @@ zun_pip_packages:
 ## (Qdrouterd) integration
 # TODO(ansmith): Change structure when more backends will be supported
 zun_oslomsg_amqp1_enabled: "{{ zun_oslomsg_rpc_transport == 'amqp' }}"
+
+zun_memcached_servers: "{{ memcached_servers }}"
 
 zun_optional_oslomsg_amqp1_pip_packages:
   - oslo.messaging[amqp1]

@@ -1071,7 +1071,7 @@ region_name = {{ keystone_service_region }}
 # undefined, tokens will instead be cached in-process. (list value)
 # Deprecated group/name - [keystone_authtoken]/memcache_servers
 #memcached_servers = <None>
-memcached_servers = {{ memcached_servers }}
+memcached_servers = {{ zun_memcached_servers }}
 
 # In order to prevent excessive effort spent validating tokens, the middleware
 # caches previously-seen tokens for a configurable duration (in seconds). Set
