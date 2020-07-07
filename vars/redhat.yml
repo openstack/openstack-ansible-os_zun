@@ -15,7 +15,9 @@
 
 zun_docker_repo:
   - name: "docker-ce"
-    uri: "https://download.docker.com/linux/centos/docker-ce.repo"
+    description: Docker CE Stable
+    uri: "https://download.docker.com/linux/centos/7/$basearch/stable"
+    gpgkey: "https://download.docker.com/linux/centos/gpg"
 
 # Common yum packages
 zun_distro_packages:
@@ -23,7 +25,7 @@ zun_distro_packages:
   - systemd-devel
 
 zun_distro_compute_packages:
-  - docker
+  - "{{ (ansible_distribution_major_version is version('8', '<')) | ternary('docker', 'docker-ce') }}"
   - pciutils
 
 zun_docker_groupname: dockerroot
