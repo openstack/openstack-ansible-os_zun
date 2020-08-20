@@ -103,7 +103,8 @@ zun_docker_api_version: false
 # zun_system_group_gid = <GID>
 
 ## Database info
-zun_db_setup_host: "{{ ('galera_all' in groups) | ternary(groups['galera_all'][0], 'localhost') }}"
+zun_db_setup_host: "{{ openstack_db_setup_host | default('localhost') }}"
+zun_db_setup_python_interpreter: "{{ openstack_db_setup_python_interpreter | default((zun_db_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_python['executable'])) }}"
 zun_galera_address: "{{ galera_address | default('127.0.0.1') }}"
 zun_galera_user: zun
 zun_galera_database: zun
@@ -114,6 +115,7 @@ zun_db_pool_timeout: 30
 zun_galera_use_ssl: "{{ galera_use_ssl | default(False) }}"
 # The path where to store the database server CA certificate
 zun_galera_ssl_ca_cert: "{{ galera_ssl_ca_cert | default('/etc/ssl/certs/galera-ca.pem') }}"
+zun_galera_port: 3306
 
 ## RabbitMQ info
 
