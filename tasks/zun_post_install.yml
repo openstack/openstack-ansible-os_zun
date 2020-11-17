@@ -18,7 +18,7 @@
     - name: Get docker api version
       command: >-
         {% raw %}
-        docker version -f "{{.Client.APIVersion }}"
+        docker version -f "{{ .Client.APIVersion }}"
         {% endraw %}
       failed_when: false
       changed_when: false

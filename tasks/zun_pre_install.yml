@@ -69,6 +69,7 @@
     - { path: "{{ zun_system_home_folder }}/.ssh", mode: "0700" }
     - { path: "{{ zun_system_home_folder }}/cache/api" }
     - { path: "{{ zun_system_home_folder }}/instances" }
+    - { path: "{{ zun_system_home_folder }}/volumes" }
     - { path: "{{ zun_lock_path }}" }
     - { path: "/var/run/zun" }
   tags:

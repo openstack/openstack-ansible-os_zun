@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+_zun_docker_package_version: "5:19.03.14~*"
+_zun_containerd_package_version: "1.4.3-1"
+
 zun_docker_repo:
   - name: "docker-ce"
     uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
@@ -27,8 +30,12 @@ zun_distro_packages:
   - software-properties-common
 
 zun_distro_compute_packages:
+  - containerd.io
+  - docker-ce-cli
   - docker-ce
   - pciutils
+  - numactl
+  - multipath-tools
 
 zun_docker_groupname: docker
 
