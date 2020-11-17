@@ -6,7 +6,9 @@ transport_url = {{ zun_oslomsg_rpc_transport }}://{% for host in zun_oslomsg_rpc
 
 use_sandbox = true
 image_driver_list = glance,docker
-default_image_driver = glance
+default_image_driver = docker
+
+capsule_driver = docker
 
 
 [api]
@@ -100,6 +102,11 @@ topics = {{ notification_topics | join(',') }}
 ssl = {{ zun_oslomsg_notify_use_ssl | bool }}
 
 
+[placement_client]
+endpoint_type = {{ zun_service_endpoint_type }}
+insecure = {{ keystone_service_adminuri_insecure | bool }}
+
+
 [scheduler]
 driver = {{ zun_scheduler_driver }}
 available_filters = {{ zun_scheduler_available_filters }}
@@ -108,7 +115,8 @@ enabled_filters = {{ zun_scheduler_default_filters }}
 
 [volume]
 use_multipath = true
-driver_list = cinder
+driver_list = cinder,local
+volume_dir = /var/lib/{{ zun_system_user_name }}/volumes
 
 
 [websocket_proxy]

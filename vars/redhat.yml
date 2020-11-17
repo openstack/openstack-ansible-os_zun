@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+_zun_docker_package_version: "19.03.14-3"
+_zun_containerd_package_version: "1.4.3-3.1"
+
 zun_docker_repo:
   - name: "docker-ce"
     description: Docker CE Stable
-    uri: "https://download.docker.com/linux/centos/7/$basearch/stable"
+    uri: "https://download.docker.com/linux/centos/{{ ansible_distribution_major_version }}/$basearch/stable"
     gpgkey: "https://download.docker.com/linux/centos/gpg"
 
 # Common yum packages
@@ -25,7 +28,11 @@ zun_distro_packages:
   - systemd-devel
 
 zun_distro_compute_packages:
-  - "{{ (ansible_distribution_major_version is version('8', '<')) | ternary('docker', 'docker-ce') }}"
+  - "containerd.io-{{ zun_containerd_package_version }}.el{{ ansible_distribution_major_version }}.x86_64"
+  - "docker-ce-cli-{{ zun_docker_package_version }}.el{{ ansible_distribution_major_version }}.x86_64"
+  - "docker-ce-{{ zun_docker_package_version }}.el{{ ansible_distribution_major_version }}.x86_64"
   - pciutils
+  - numactl
+  - device-mapper-multipath
 
-zun_docker_groupname: dockerroot
+zun_docker_groupname: docker
