@@ -15,6 +15,15 @@
 
 - project:
     templates:
-      - openstack-ansible-role-jobs
+      - check-requirements
+      - openstack-ansible-deploy-aio_metal-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
+    check:
+      jobs:
+        - openstack-ansible-upgrade-aio_metal-ubuntu-focal:
+            voting: false
+    gate:
+      jobs:
+        - openstack-ansible-upgrade-aio_metal-ubuntu-focal:
+            voting: false

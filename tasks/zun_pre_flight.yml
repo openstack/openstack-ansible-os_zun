@@ -24,13 +24,13 @@
     - "zun_api"
     - "zun_compute"
 
-- name: Check for oslomsg_rpc_all group
+- name: Check for rabbitmq_all group
   fail:
     msg: >-
-      The group `oslomsg_rpc_all` is undefined. Before moving forward
+      The group `rabbitmq_all` is undefined. Before moving forward
       set this group within inventory with at least one host.
   when:
-    - (groups['oslomsg_rpc_all'] | length) < 1
+    - (groups['rabbitmq_all'] | length) < 1
 
 - name: Check for oslomsg_rpc_password
   fail:

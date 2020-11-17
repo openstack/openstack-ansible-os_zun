@@ -26,6 +26,23 @@
 
 - name: Run apt install block
   block:
+    - name: Run the apt package pinning role
+      include_role:
+        name: apt_package_pinning
+      vars:
+        apt_package_pinning_file_name: "docker.pref"
+        apt_package_pinning_priority: 999
+        apt_pinned_packages:
+          - package: "docker-ce"
+            version: "{{ zun_docker_package_version }}"
+            priority: 1000
+          - package: "docker-ce-cli"
+            version: "{{ zun_docker_package_version }}"
+            priority: 1000
+          - package: "containerd.io"
+            version: "{{ zun_containerd_package_version }}"
+            priority: 1000
+
     - name: Get apt gpg key
       get_url:
         url: "{{ item.gpg_uri }}"
@@ -96,11 +113,20 @@
     cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
     enablerepo: "{{ (ansible_pkg_mgr in ['yum', 'dnf']) | ternary('extras', omit) }}"
 
+- name: Ensure the Docker config directory exists
+  file:
+    path: "/etc/docker"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
 - name: Generate kuryr config
   config_template:
     content: |
       {
-        "live-restore": true
+        "live-restore": true,
+        "default-ipc-mode": "shareable"
       }
     dest: "/etc/docker/daemon.json"
     owner: "root"
@@ -145,6 +171,7 @@
     createhome: "yes"
     home: "{{ zun_kuryr_system_home_folder }}"
     generate_ssh_key: "yes"
+  when: zun_kuryr_system_user_name != 'root'
   tags:
     - zun-kuryr-user
     - zun-kuryr-key
@@ -211,7 +238,7 @@
 - name: Ensure docker users are added to the docker group
   user:
     name: "{{ item }}"
-    group: "{{ zun_docker_groupname }}"
+    groups: "{{ zun_docker_groupname }}"
     append: yes
   with_items: "{{ zun_docker_users }}"
 
@@ -225,3 +252,15 @@
   tags:
     - sudoers
     - zun-sudoers
+
+- name: Configure multipathd (RedHat only)
+  command:
+    cmd: "/sbin/mpathconf --enable"
+    creates: "/etc/multipath.conf"
+  when: ansible_os_family == "RedHat"
+
+- name: Enable multipathd service
+  systemd:
+    name: multipathd
+    state: started
+    enabled: yes

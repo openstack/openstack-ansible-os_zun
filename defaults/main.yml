@@ -46,9 +46,15 @@ zun_git_install_branch: master
 zun_kuryr_git_repo: https://opendev.org/openstack/kuryr-libnetwork
 zun_kuryr_git_install_branch: master
 
+# This is only required until kuryr-libnetwork depends upon a version of kuryr-lib
+# which includes https://review.opendev.org/c/openstack/kuryr/+/764908
+zun_kuryr_lib_git_repo: https://opendev.org/openstack/kuryr
+zun_kuryr_lib_git_install_branch: master
+
 zun_upper_constraints_url: "{{ requirements_git_url | default('https://releases.openstack.org/constraints/upper/' ~ requirements_git_install_branch | default('master')) }}"
 zun_git_constraints:
   - "git+{{ zun_git_repo }}@{{ zun_git_install_branch }}#egg=zun"
+  - "git+{{ zun_kuryr_lib_git_repo }}@{{ zun_kuryr_lib_git_install_branch }}#egg=kuryr-lib"
   - "git+{{ zun_kuryr_git_repo }}@{{ zun_kuryr_git_install_branch }}#egg=kuryr-libnetwork"
   - "--constraint {{ zun_upper_constraints_url }}"
 
@@ -79,6 +85,10 @@ zun_kuryr_system_home_folder: "/var/lib/{{ zun_kuryr_system_user_name }}"
 zun_kuryr_log_dir: "/var/log/kuryr"
 
 zun_kuryr_lock_path: "/var/lock/kuryr"
+
+## Docker setup information
+zun_docker_package_version: "{{ _zun_docker_package_version }}"
+zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
 
 # Set a list of users that are permitted to execute the docker binary.
 zun_docker_users:
@@ -176,7 +186,7 @@ zun_kuryr_service_port: 23750
 zun_service_description: "Zun Compute Service"
 zun_service_publicuri: "{{ zun_service_publicuri_proto }}://{{ external_lb_vip_address }}:{{ zun_service_port }}"
 zun_service_publicurl: "{{ zun_service_publicuri }}"
-zun_service_adminuri: "{{ zun_service_adminuri_proto }}//{{ internal_lb_vip_address }}:{{ zun_service_port }}"
+zun_service_adminuri: "{{ zun_service_adminuri_proto }}://{{ internal_lb_vip_address }}:{{ zun_service_port }}"
 zun_service_adminurl: "{{ zun_service_adminuri }}"
 zun_service_internaluri: "{{ zun_service_internaluri_proto }}://{{ internal_lb_vip_address }}:{{ zun_service_port }}"
 zun_service_internalurl: "{{ zun_service_internaluri }}"
@@ -223,7 +233,7 @@ zun_services:
     group: zun_compute
     service_name: kuryr-libnetwork
     condition: "{{ inventory_hostname in groups['zun_compute'] }}"
-    init_config_overrides: "{{ zun_kuryr_init_overrides }}"
+    init_config_overrides: "{{ zun_kuryr_init_defaults | combine(zun_kuryr_init_overrides) }}"
     start_order: 3
     wsgi_app: True
     wsgi: kuryr_libnetwork.server:app
@@ -298,17 +308,22 @@ zun_api_init_overrides: {}
 zun_wsproxy_init_overrides: {}
 zun_compute_init_overrides: {}
 
-## Default zun+kuryr options used within the system unit file.
-# NOTE(cloudnull): These options are used to ensure that kuryr is always
-#                  started after docker and has the proper capabilities.
-zun_kuryr_init_overrides:
+
+## Default zun+kuryr options used within the systemd unit file.
+zun_kuryr_init_defaults:
   Unit:
-    After:
-      ? network-online.target
-      ? docker.service
-    PartOf: docker.service
+    Before: docker.service
+    After: network-online.target
     Wants: network-online.target
   Service:
     CapabilityBoundingSet: CAP_NET_ADMIN
+    AmbientCapabilities: CAP_NET_ADMIN
     Group: "{{ zun_kuryr_system_group_name }}"
     User: "{{ zun_kuryr_system_user_name }}"
+
+## Tunable overrides for service unit files.
+zun_api_paste_ini_overrides: {}
+zun_api_init_overrides: {}
+zun_wsproxy_init_overrides: {}
+zun_compute_init_overrides: {}
+zun_kuryr_init_overrides: {}
