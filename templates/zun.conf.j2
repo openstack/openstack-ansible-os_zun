@@ -120,8 +120,10 @@ volume_dir = /var/lib/{{ zun_system_user_name }}/volumes
 
 
 [websocket_proxy]
-wsproxy_host = 0.0.0.0
-wsproxy_port = 6784
+base_url = {{ zun_wsproxy_base_uri }}
+wsproxy_host = {{ zun_wsproxy_host }}
+wsproxy_port = {{ zun_wsproxy_port }}
+
 
 [zun_client]
 endpoint_type = {{ zun_service_endpoint_type }}
