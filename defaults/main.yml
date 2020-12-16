@@ -182,6 +182,12 @@ zun_kuryr_service_username: kuryr
 ## Keystone authentication middleware
 zun_keystone_auth_plugin: password
 
+## Zun WebSocket Proxy
+zun_wsproxy_proto: "{{ (openstack_service_publicuri_proto | default('http') == 'https') | ternary('wss', 'ws') }}"
+zun_wsproxy_port: 6784
+zun_wsproxy_host: "{{ openstack_service_bind_address | default('0.0.0.0') }}"
+zun_wsproxy_base_uri: "{{ zun_wsproxy_proto }}://{{ external_lb_vip_address }}:{{ zun_wsproxy_port }}"
+
 ## Zun v1
 zun_service_name: zun
 zun_service_type: container
