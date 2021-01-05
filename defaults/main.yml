@@ -235,7 +235,7 @@ zun_services:
     group: zun_compute
     service_name: kuryr-libnetwork
     condition: "{{ inventory_hostname in groups['zun_compute'] }}"
-    init_config_overrides: "{{ zun_kuryr_init_overrides }}"
+    init_config_overrides: "{{ zun_kuryr_init_defaults | combine(zun_kuryr_init_overrides) }}"
     start_order: 3
     wsgi_app: True
     wsgi: kuryr_libnetwork.server:app
@@ -304,24 +304,21 @@ zun_kuryr_uwsgi_conf_overrides:
   uwsgi:
     pyargv: --config-file /etc/kuryr/kuryr.conf
 
-## Tubnable overrides for service unit files.
-zun_api_paste_ini_overrides: {}
-zun_api_init_overrides: {}
-zun_wsproxy_init_overrides: {}
-zun_compute_init_overrides: {}
-
-## Default zun+kuryr options used within the system unit file.
-# NOTE(cloudnull): These options are used to ensure that kuryr is always
-#                  started after docker and has the proper capabilities.
-zun_kuryr_init_overrides:
+## Default zun+kuryr options used within the systemd unit file.
+zun_kuryr_init_defaults:
   Unit:
-    After:
-      ? network-online.target
-      ? docker.service
-    PartOf: docker.service
+    Before: docker.service
+    After: network-online.target
     Wants: network-online.target
   Service:
     CapabilityBoundingSet: CAP_NET_ADMIN
     AmbientCapabilities: CAP_NET_ADMIN
     Group: "{{ zun_kuryr_system_group_name }}"
     User: "{{ zun_kuryr_system_user_name }}"
+
+## Tunable overrides for service unit files.
+zun_api_paste_ini_overrides: {}
+zun_api_init_overrides: {}
+zun_wsproxy_init_overrides: {}
+zun_compute_init_overrides: {}
+zun_kuryr_init_overrides: {}
