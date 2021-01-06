@@ -7,8 +7,8 @@ transport_url = {{ zun_oslomsg_rpc_transport }}://{% for host in zun_oslomsg_rpc
 use_sandbox = true
 image_driver_list = glance,docker
 default_image_driver = docker
-
 capsule_driver = docker
+container_runtime = {{ zun_container_runtime }}
 
 
 [api]

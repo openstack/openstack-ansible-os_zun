@@ -15,11 +15,18 @@
 
 _zun_docker_package_version: "5:19.03.14~*"
 _zun_containerd_package_version: "1.4.3-1"
+_zun_kata_package_version: "{{ (ansible_distribution_release | lower == 'focal') | ternary('1.12.0-2', '1.11.5-9') }}"
+
+zun_kata_repo_version: "{{ (ansible_distribution_release | lower == 'focal') | ternary('stable-1.12', 'stable-1.11') }}"
+zun_kata_repo_distro: "{{ (ansible_distribution | lower == 'ubuntu') | ternary('x', '') }}{{ ansible_distribution | capitalize }}"
 
 zun_docker_repo:
   - name: "docker-ce"
-    uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
     gpg_uri: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  - name: "kata"
+    repo: "deb https://download.opensuse.org/repositories/home:/katacontainers:/releases:/{{ ansible_architecture }}:/{{ zun_kata_repo_version }}/{{ zun_kata_repo_distro }}_{{ ansible_distribution_version }}/ /"
+    gpg_uri: "https://download.opensuse.org/repositories/home:/katacontainers:/releases:/{{ ansible_architecture }}:/{{ zun_kata_repo_version }}/{{ zun_kata_repo_distro }}_{{ ansible_distribution_version }}/Release.key"
 
 # Common apt packages
 zun_distro_packages:
@@ -36,6 +43,9 @@ zun_distro_compute_packages:
   - pciutils
   - numactl
   - multipath-tools
+  - kata-runtime
+  - kata-proxy
+  - kata-shim
 
 zun_docker_groupname: docker
 

@@ -89,6 +89,7 @@ zun_kuryr_lock_path: "/var/lock/kuryr"
 ## Docker setup information
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
 zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
+zun_kata_package_version: "{{ _zun_kata_package_version }}"
 
 # Set a list of users that are permitted to execute the docker binary.
 zun_docker_users:
@@ -207,6 +208,9 @@ zun_service_endpoint_type: internalURL
 zun_recreate_keys: False
 
 ## General Zun configuration
+# Select between the 'runc' or 'kata' runtime
+zun_container_runtime: runc
+
 # If ``zun_osapi_compute_workers`` is unset the system will use half the number of available VCPUS to
 # compute the number of api workers to use.
 # zun_osapi_compute_workers: 16
