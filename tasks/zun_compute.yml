@@ -264,3 +264,11 @@
     name: multipathd
     state: started
     enabled: yes
+
+- name: Create script to clean up old Docker data
+  template:
+    src: "zun-docker-cleanup.j2"
+    dest: "{{ zun_bin }}/zun-docker-cleanup"
+    owner: "root"
+    group: "root"
+    mode: "0755"
