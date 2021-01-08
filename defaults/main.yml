@@ -15,13 +15,13 @@
 
 
 # Enable/Disable barbican configurations
-zun_barbican_enabled: False
+zun_barbican_enabled: "{{ (groups['barbican_all'] is defined) and (groups['barbican_all'] | length > 0) }}"
 # Enable/Disable designate configurations
-zun_designate_enabled: False
+zun_designate_enabled: "{{ (groups['designate_all'] is defined) and (groups['designate_all'] | length > 0) }}"
 # Notification topics for designate.
 zun_notifications_designate: notifications_designate
 # Enable/Disable ceilometer configurations
-zun_ceilometer_enabled: False
+zun_ceilometer_enabled: "{{ (groups['ceilometer_all'] is defined) and (groups['ceilometer_all'] | length > 0) }}"
 
 ## Verbosity Options
 debug: False
@@ -35,10 +35,9 @@ zun_venv_python_executable: "{{ openstack_venv_python_executable | default('pyth
 zun_service_setup_host: "{{ openstack_service_setup_host | default('localhost') }}"
 zun_service_setup_host_python_interpreter: "{{ openstack_service_setup_host_python_interpreter | default((zun_service_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_python['executable'])) }}"
 
-# Set the package install state for distribution and pip packages
+# Set the package install state for distribution packages
 # Options are 'present' and 'latest'
-zun_package_state: "latest"
-zun_pip_package_state: "latest"
+zun_package_state: "{{ package_state | default('latest') }}"
 
 zun_git_repo: https://opendev.org/openstack/zun
 zun_git_install_branch: master
@@ -125,7 +124,7 @@ zun_db_pool_timeout: 30
 zun_galera_use_ssl: "{{ galera_use_ssl | default(False) }}"
 # The path where to store the database server CA certificate
 zun_galera_ssl_ca_cert: "{{ galera_ssl_ca_cert | default('/etc/ssl/certs/galera-ca.pem') }}"
-zun_galera_port: 3306
+zun_galera_port: "{{ galera_port | default('3306') }}"
 
 ## RabbitMQ info
 
@@ -161,7 +160,7 @@ zun_oslomsg_notify_vhost: "{{ zun_oslomsg_rpc_vhost }}"
 #zun_virt_type: kvm
 
 ## Zun Auth
-zun_service_region: RegionOne
+zun_service_region: "{{ service_region | default('RegionOne') }}"
 zun_service_project_name: "service"
 zun_service_project_domain_id: default
 zun_service_user_domain_id: default
@@ -215,7 +214,7 @@ zun_recreate_keys: False
 zun_api_threads_max: 16
 zun_api_threads: "{{ [[ansible_processor_vcpus|default(2) // 2, 1] | max, zun_api_threads_max] | min }}"
 
-zun_service_in_ldap: false
+zun_service_in_ldap: "{{ service_ldap_backend_enabled | default(False) }}"
 
 zun_scheduler_default_filters: >-
   AvailabilityZoneFilter,
