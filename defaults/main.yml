@@ -100,6 +100,14 @@ zun_docker_users:
 # version will be used as determined by the client version information.
 zun_docker_api_version: false
 
+# Time period for which to clean up old Docker data. The options are hour, day,
+# month, or year. (string value)
+zun_docker_prune_frequency: hour
+
+# Which Docker data to clean up when running the above periodic task
+zun_docker_prune_images: True
+zun_docker_prune_networks: True
+
 ## Manually specified zun UID/GID
 # Deployers can specify a UID for the zun user as well as the GID for the
 # zun group if needed. This is commonly used in environments where shared
@@ -268,6 +276,18 @@ zun_services:
     init_config_overrides: "{{ zun_wsproxy_init_overrides }}"
     start_order: 2
     execstarts: "{{ zun_bin }}/zun-wsproxy --config-dir /etc/zun"
+  zun-docker-cleanup:
+    group: zun_compute
+    service_name: zun-docker-cleanup
+    init_config_overrides: "{{ zun_docker_cleanup_init_overrides }}"
+    start_order: 5
+    execstarts: "{{ zun_bin }}/zun-docker-cleanup"
+    timer:
+      state: started
+      options:
+        OnBootSec: 30min
+        OnCalendar: "{{ (zun_docker_prune_frequency == 'day') | ternary('daily', zun_docker_prune_frequency+'ly') }}"
+        Persistent: true
 
 # Common pip packages
 zun_pip_packages:
@@ -322,3 +342,4 @@ zun_api_init_overrides: {}
 zun_wsproxy_init_overrides: {}
 zun_compute_init_overrides: {}
 zun_kuryr_init_overrides: {}
+zun_docker_cleanup_init_overrides: {}

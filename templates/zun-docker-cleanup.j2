@@ -1,0 +1,7 @@
+#!/bin/bash
+{% if zun_docker_prune_images %}
+docker image prune -a -f --filter "until=1h"
+{% endif %}
+{% if zun_docker_prune_networks %}
+docker network prune -f --filter "until=1h"
+{% endif %}
