@@ -1,7 +1,15 @@
 #!/bin/bash
-{% if zun_docker_prune_images %}
-docker image prune -a -f --filter "until=1h"
-{% endif %}
-{% if zun_docker_prune_networks %}
-docker network prune -f --filter "until=1h"
-{% endif %}
+
+# If the disabled file is present, don't allow the script
+# to run unless it is forced.
+if [ -e "/var/tmp/zun-docker-cleanup.disabled" ] && [ "$1" != "--force" ]; then
+    echo "Timed cleanup of Docker data is disabled"
+    echo "To force a cleanup, re-run this script with '--force'"
+    exit 0
+fi
+
+# Clear dangling images from Docker
+docker image prune -f
+
+# Clear old images from Zun cache directory
+find /var/cache/zun -amin +1440 -type f -exec rm -fv {} \;

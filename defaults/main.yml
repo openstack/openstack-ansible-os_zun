@@ -101,13 +101,12 @@ zun_docker_api_version: false
 zun_docker_bind_host: "{{ openstack_service_bind_address | default('0.0.0.0') }}"
 zun_docker_bind_port: 2375
 
+# Should Docker image cache data be periodically cleaned up?
+zun_docker_prune_images: False
+
 # Time period for which to clean up old Docker data. The options are hour, day,
 # month, or year. (string value)
 zun_docker_prune_frequency: hour
-
-# Which Docker data to clean up when running the above periodic task
-zun_docker_prune_images: True
-zun_docker_prune_networks: True
 
 ## Manually specified zun UID/GID
 # Deployers can specify a UID for the zun user as well as the GID for the

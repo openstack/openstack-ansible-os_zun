@@ -295,6 +295,11 @@
     group: "root"
     mode: "0755"
 
+- name: Set state for timed data cleanup
+  file:
+    path: "/var/tmp/zun-docker-cleanup.disabled"
+    state: "{{ zun_docker_prune_images | ternary('absent', 'touch') }}"
+
 - name: Remove legacy systemd docker override
   file:
     path: "/etc/systemd/system/docker.service.d/zun-docker.conf"
