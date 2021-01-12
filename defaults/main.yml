@@ -221,7 +221,7 @@ zun_recreate_keys: False
 
 ## Cap the maximun number of threads / workers when a user value is unspecified.
 zun_api_threads_max: 16
-zun_api_threads: "{{ [[ansible_processor_vcpus|default(2) // 2, 1] | max, zun_api_threads_max] | min }}"
+zun_api_threads: "{{ [[(ansible_processor_vcpus//ansible_processor_threads_per_core)|default(1), 1] | max * 2, zun_api_threads_max] | min }}"
 
 zun_service_in_ldap: false
 
