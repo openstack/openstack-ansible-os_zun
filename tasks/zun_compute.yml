@@ -42,6 +42,15 @@
           - package: "containerd.io"
             version: "{{ zun_containerd_package_version }}"
             priority: 1000
+          - package: "kata-runtime"
+            version: "{{ zun_kata_package_version }}"
+            priority: 1000
+          - package: "kata-proxy"
+            version: "{{ zun_kata_package_version }}"
+            priority: 1000
+          - package: "kata-shim"
+            version: "{{ zun_kata_package_version }}"
+            priority: 1000
 
     - name: Get apt gpg key
       get_url:
@@ -58,7 +67,7 @@
 
     - name: Add apt repository
       apt_repository:
-        repo: deb [arch=amd64] {{ item.uri }} {{ ansible_distribution_release | lower }} stable
+        repo: "{{ item.repo }}"
         state: present
         filename: "{{ item.name }}"
         update_cache: no
@@ -81,7 +90,7 @@
   yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
-    baseurl: "{{ item.uri }}"
+    baseurl: "{{ item.repo }}"
     gpgkey: "{{ item.gpgkey | default(omit) }}"
     gpgcheck: yes
     enabled: yes
@@ -113,6 +122,24 @@
     cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
     enablerepo: "{{ (ansible_pkg_mgr in ['yum', 'dnf']) | ternary('extras', omit) }}"
 
+- name: Ensure the containerd config directory exists
+  file:
+    path: "/etc/containerd"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Configure containerd
+  template:
+    src: "config.toml.j2"
+    dest: "/etc/containerd/config.toml"
+    mode: "0644"
+    owner: "root"
+    group: "root"
+  notify:
+    - Restart containerd
+
 - name: Ensure the Docker config directory exists
   file:
     path: "/etc/docker"
@@ -135,7 +162,7 @@
     config_overrides: "{{ zun_docker_config_overrides }}"
     config_type: "json"
   notify:
-    - Restart kuryr services
+    - Restart docker
 
 - name: Create the kuryr system group
   group:
@@ -214,7 +241,7 @@
       config_type: "ini"
   notify:
     - Manage LB
-    - Restart kuryr services
+    - Restart docker
   tags:
     - zun-config
     - zun-post-install
@@ -233,7 +260,7 @@
     config_overrides: "{{ zun_kuryr_config_overrides }}"
     config_type: "json"
   notify:
-    - Restart kuryr services
+    - Restart docker
 
 - name: Ensure docker users are added to the docker group
   user:

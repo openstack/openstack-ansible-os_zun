@@ -13,6 +13,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Stop containerd
+  systemd:
+    name: "containerd"
+    enabled: yes
+    state: "stopped"
+    daemon_reload: yes
+  register: _stop
+  until: _stop is success
+  retries: 5
+  delay: 2
+  listen: "Restart containerd"
+
+- name: Start containerd
+  systemd:
+    name: "containerd"
+    enabled: yes
+    state: "started"
+    daemon_reload: yes
+  register: _start
+  until: _start is success
+  retries: 5
+  delay: 2
+  listen: "Restart containerd"
+
+- name: Stop docker
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: "stopped"
+    daemon_reload: yes
+  with_items:
+    - docker
+    - kuryr-libnetwork
+  register: _stop
+  until: _stop is success
+  retries: 5
+  delay: 2
+  listen: "Restart docker"
+
+- name: Start docker
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: "started"
+    daemon_reload: yes
+  with_items:
+    - kuryr-libnetwork
+    - docker
+  register: _start
+  until: _start is success
+  retries: 5
+  delay: 2
+  listen: "Restart docker"
+
 - name: Stop services
   systemd:
     name: "{{ item.service_name }}"
@@ -42,36 +96,6 @@
   listen:
     - "Restart zun services"
     - "venv changed"
-
-- name: Stop docker
-  systemd:
-    name: "{{ item }}"
-    enabled: yes
-    state: "stopped"
-    daemon_reload: yes
-  with_items:
-    - docker
-    - kuryr-libnetwork
-  register: _stop
-  until: _stop is success
-  retries: 5
-  delay: 2
-  listen: "Restart kuryr services"
-
-- name: Start docker
-  systemd:
-    name: "{{ item }}"
-    enabled: yes
-    state: "started"
-    daemon_reload: yes
-  with_items:
-    - docker
-    - kuryr-libnetwork
-  register: _start
-  until: _start is success
-  retries: 5
-  delay: 2
-  listen: "Restart kuryr services"
 
 - meta: noop
   listen: Manage LB
