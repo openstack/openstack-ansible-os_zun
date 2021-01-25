@@ -32,12 +32,23 @@
   tags:
     - zun-install
 
+# NOTE(jrosser)
+# kuryr-lib appears in u-c and the new pip resolver will fail to install
+# if two contradictory constraints are given which will always happen
+# with a source install and wheels built on the repo server. We must
+# filter kuryr-lib out of u-c.
+- name: Retrieve the constraints URL
+  uri:
+    url: "{{ zun_upper_constraints_url }}"
+    return_content: yes
+  register: _u_c_contents
+
 - name: Install the python venv
   import_role:
     name: "python_venv_build"
   vars:
     venv_python_executable: "{{ zun_venv_python_executable }}"
-    venv_build_constraints: "{{ zun_git_constraints }}"
+    venv_build_constraints: "{{ _u_c_contents.content.split('\n') | reject('match', '[kuryr\\-lib=*]') | list }}"
     venv_install_destination_path: "{{ zun_bin | dirname }}"
     venv_install_distro_package_list: "{{ zun_distro_packages }}"
     venv_pip_install_args: "{{ zun_pip_install_args }}"
