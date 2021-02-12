@@ -278,7 +278,7 @@ zun_services:
     group: zun_compute
     service_name: zun-compute
     init_config_overrides: "{{ zun_compute_init_overrides }}"
-    start_order: 4
+    start_order: 5
     execstarts: "{{ zun_bin }}/zun-compute --config-dir /etc/zun"
   zun-wsproxy:
     group: zun_api
@@ -290,7 +290,7 @@ zun_services:
     group: zun_compute
     service_name: zun-docker-cleanup
     init_config_overrides: "{{ zun_docker_cleanup_init_overrides }}"
-    start_order: 5
+    start_order: 6
     execstarts: "{{ zun_bin }}/zun-docker-cleanup"
     timer:
       state: started
@@ -298,6 +298,13 @@ zun_services:
         OnBootSec: 30min
         OnCalendar: "{{ (zun_docker_prune_frequency == 'day') | ternary('daily', zun_docker_prune_frequency+'ly') }}"
         Persistent: true
+  docker:
+    group: zun_compute
+    service_name: docker
+    init_config_overrides: {}
+    start_order: 4
+    systemd_overrides_only: True
+    systemd_overrides: "{{ zun_docker_init_defaults | combine(zun_docker_init_overrides) }}"
 
 # Common pip packages
 zun_pip_packages:
@@ -347,10 +354,18 @@ zun_kuryr_init_defaults:
     Group: "{{ zun_kuryr_system_group_name }}"
     User: "{{ zun_kuryr_system_user_name }}"
 
+## Default zun+docker options used within the systemd unit file.
+zun_docker_init_defaults:
+  Service:
+    ExecStart:
+      - ""
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %} --add-runtime kata=/usr/bin/kata-runtime"
+
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
 zun_api_init_overrides: {}
 zun_wsproxy_init_overrides: {}
 zun_compute_init_overrides: {}
 zun_kuryr_init_overrides: {}
+zun_docker_init_overrides: {}
 zun_docker_cleanup_init_overrides: {}

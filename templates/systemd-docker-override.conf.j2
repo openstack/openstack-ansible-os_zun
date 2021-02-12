@@ -1,3 +1,0 @@
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %} --add-runtime kata=/usr/bin/kata-runtime
