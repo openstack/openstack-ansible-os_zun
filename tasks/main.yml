@@ -24,10 +24,6 @@
   tags:
     - always
 
-- import_tasks: zun_pre_flight.yml
-  tags:
-    - always
-
 - import_tasks: zun_pre_install.yml
   tags:
     - zun-install
