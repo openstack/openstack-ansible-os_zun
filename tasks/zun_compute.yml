@@ -13,17 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Add zypper repository
-  zypper_repository:
-    auto_import_keys: yes
-    autorefresh: yes
-    name: "{{ item.name }}"
-    repo: "{{ item.uri }}"
-    runrefresh: yes
-  with_items: "{{ zun_docker_repo }}"
-  when:
-    - ansible_pkg_mgr == 'zypper'
-
 - name: Run apt install block
   block:
     - name: Run the apt package pinning role
@@ -101,7 +90,7 @@
   delay: 2
   with_items: "{{ zun_docker_repo }}"
   when:
-    - ansible_pkg_mgr in ['yum', 'dnf']
+    - ansible_pkg_mgr == 'dnf'
 
 - name: Enable module_hotfixes
   lineinfile:
@@ -112,15 +101,14 @@
   with_items: "{{ zun_docker_repo }}"
   when:
     - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_major_version is version('8', '>=')
 
 - name: Install compute distro packages
   package:
     name: "{{ zun_distro_compute_packages }}"
     state: "{{ zun_package_state }}"
-    update_cache: "{{ (ansible_pkg_mgr in ['apt', 'zypper']) | ternary('yes', omit) }}"
+    update_cache: "{{ (ansible_pkg_mgr == 'apt') | ternary('yes', omit) }}"
     cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
-    enablerepo: "{{ (ansible_pkg_mgr in ['yum', 'dnf']) | ternary('extras', omit) }}"
+    enablerepo: "{{ (ansible_pkg_mgr == 'dnf') | ternary('extras', omit) }}"
 
 - name: Ensure the containerd config directory exists
   file:
