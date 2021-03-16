@@ -33,7 +33,7 @@ zun_venv_python_executable: "{{ openstack_venv_python_executable | default('pyth
 # for the service setup. The host must already have
 # clouds.yaml properly configured.
 zun_service_setup_host: "{{ openstack_service_setup_host | default('localhost') }}"
-zun_service_setup_host_python_interpreter: "{{ openstack_service_setup_host_python_interpreter | default((zun_service_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_python['executable'])) }}"
+zun_service_setup_host_python_interpreter: "{{ openstack_service_setup_host_python_interpreter | default((zun_service_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_facts['python']['executable'])) }}"
 
 # Set the package install state for distribution packages
 # Options are 'present' and 'latest'
@@ -122,7 +122,7 @@ zun_docker_prune_frequency: hour
 
 ## Database info
 zun_db_setup_host: "{{ openstack_db_setup_host | default('localhost') }}"
-zun_db_setup_python_interpreter: "{{ openstack_db_setup_python_interpreter | default((zun_db_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_python['executable'])) }}"
+zun_db_setup_python_interpreter: "{{ openstack_db_setup_python_interpreter | default((zun_db_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_facts['python']['executable'])) }}"
 zun_galera_address: "{{ galera_address | default('127.0.0.1') }}"
 zun_galera_user: zun
 zun_galera_database: zun
@@ -230,7 +230,7 @@ zun_container_runtime: runc
 
 ## Cap the maximun number of threads / workers when a user value is unspecified.
 zun_api_threads_max: 16
-zun_api_threads: "{{ [[(ansible_processor_vcpus//ansible_processor_threads_per_core)|default(1), 1] | max * 2, zun_api_threads_max] | min }}"
+zun_api_threads: "{{ [[(ansible_facts['processor_vcpus']//ansible_facts['processor_threads_per_core'])|default(1), 1] | max * 2, zun_api_threads_max] | min }}"
 
 zun_service_in_ldap: "{{ service_ldap_backend_enabled | default(False) }}"
 
@@ -244,7 +244,7 @@ zun_scheduler_driver: filter_scheduler
 ## uWSGI setup
 zun_wsgi_threads: 1
 zun_wsgi_processes_max: 16
-zun_wsgi_processes: "{{ [[ansible_processor_vcpus|default(1), 1] | max * 2, zun_wsgi_processes_max] | min }}"
+zun_wsgi_processes: "{{ [[ansible_facts['processor_vcpus']|default(1), 1] | max * 2, zun_wsgi_processes_max] | min }}"
 
 ## Service Name-Group Mapping
 zun_services:

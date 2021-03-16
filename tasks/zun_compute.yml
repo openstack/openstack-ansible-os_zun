@@ -73,7 +73,7 @@
       delay: 2
 
   when:
-    - "ansible_pkg_mgr == 'apt'"
+    - "ansible_facts['pkg_mgr'] == 'apt'"
 
 - name: Add docker repo
   yum_repository:
@@ -90,7 +90,7 @@
   delay: 2
   with_items: "{{ zun_docker_repo }}"
   when:
-    - ansible_pkg_mgr == 'dnf'
+    - ansible_facts['pkg_mgr'] == 'dnf'
 
 - name: Enable module_hotfixes
   lineinfile:
@@ -100,15 +100,15 @@
     insertafter: "^enabled"
   with_items: "{{ zun_docker_repo }}"
   when:
-    - ansible_os_family | lower == 'redhat'
+    - ansible_facts['os_family'] | lower == 'redhat'
 
 - name: Install compute distro packages
   package:
     name: "{{ zun_distro_compute_packages }}"
     state: "{{ zun_package_state }}"
-    update_cache: "{{ (ansible_pkg_mgr == 'apt') | ternary('yes', omit) }}"
-    cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(cache_timeout, omit) }}"
-    enablerepo: "{{ (ansible_pkg_mgr == 'dnf') | ternary('extras', omit) }}"
+    update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
+    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(cache_timeout, omit) }}"
+    enablerepo: "{{ (ansible_facts['pkg_mgr'] == 'dnf') | ternary('extras', omit) }}"
 
 - name: Ensure the containerd config directory exists
   file:
@@ -267,7 +267,7 @@
   command:
     cmd: "/sbin/mpathconf --enable"
     creates: "/etc/multipath.conf"
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Enable multipathd service
   systemd:
