@@ -60,6 +60,25 @@
     - zun-config
     - zun-post-install
 
+- name: Implement policy.yaml if there are overrides configured
+  config_template:
+    content: "{{ zun_policy_overrides }}"
+    dest: "/etc/zun/policy.yaml"
+    config_type: yaml
+  when:
+    - zun_policy_overrides | length > 0
+  tags:
+    - zun-policy-override
+
+- name: Remove legacy policy.yaml file
+  file:
+    path: "/etc/zun/policy.yaml"
+    state: absent
+  when:
+    - zun_policy_overrides | length == 0
+  tags:
+    - zun-policy-override
+
 - name: Synchronize the zun DB schema
   command: "{{ zun_bin }}/zun-db-manage --config-dir /etc/zun upgrade"
   become: yes
