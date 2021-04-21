@@ -88,10 +88,10 @@ driver = {{ (zun_ceilometer_enabled | bool) | ternary('messagingv2', 'noop') }}
 transport_url = {{ zun_oslomsg_notify_transport }}://{% for host in zun_oslomsg_notify_servers.split(',') %}{{ zun_oslomsg_notify_userid }}:{{ zun_oslomsg_notify_password }}@{{ host }}:{{ zun_oslomsg_notify_port }}{% if not loop.last %},{% else %}/{{ zun_oslomsg_notify_vhost }}{% if (zun_oslomsg_notify_use_ssl | lower) | bool %}?ssl=1{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
 {% if zun_ceilometer_enabled or zun_designate_enabled %}
 {% set notification_topics = [] %}
-{% if neutron_ceilometer_enabled %}
+{% if zun_ceilometer_enabled %}
 {%   set _ = notification_topics.append('notifications') %}
 {% endif %}
-{% if neutron_designate_enabled %}
+{% if zun_designate_enabled %}
 {%   set _ = notification_topics.append(zun_notifications_designate) %}
 {% endif %}
 topics = {{ notification_topics | join(',') }}
