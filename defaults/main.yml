@@ -153,6 +153,8 @@ zun_oslomsg_rpc_port: "{{ oslomsg_rpc_port | default('5672') }}"
 zun_oslomsg_rpc_use_ssl: "{{ oslomsg_rpc_use_ssl | default(False) }}"
 zun_oslomsg_rpc_userid: zun
 zun_oslomsg_rpc_vhost: /zun
+zun_oslomsg_rpc_ssl_version: "{{ oslomsg_rpc_ssl_version | default('TLSv1_2') }}"
+zun_oslomsg_rpc_ssl_ca_file: "{{ oslomsg_rpc_ssl_ca_file | default('') }}"
 
 # Notify
 zun_oslomsg_notify_host_group: "{{ oslomsg_notify_host_group | default('rabbitmq_all') }}"
@@ -164,6 +166,8 @@ zun_oslomsg_notify_use_ssl: "{{ oslomsg_notify_use_ssl | default(False) }}"
 zun_oslomsg_notify_userid: "{{ zun_oslomsg_rpc_userid }}"
 zun_oslomsg_notify_password: "{{ zun_oslomsg_rpc_password }}"
 zun_oslomsg_notify_vhost: "{{ zun_oslomsg_rpc_vhost }}"
+zun_oslomsg_notify_ssl_version: "{{ oslomsg_notify_ssl_version | default('TLSv1_2') }}"
+zun_oslomsg_notify_ssl_ca_file: "{{ oslomsg_notify_ssl_ca_file | default('') }}"
 
 # If this is not set, then the playbook will try to guess it.
 #zun_virt_type: kvm
