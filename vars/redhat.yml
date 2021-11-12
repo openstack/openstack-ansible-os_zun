@@ -16,6 +16,7 @@
 _zun_docker_package_version: "19.03.14-3"
 _zun_containerd_package_version: "1.4.3-3.1"
 _zun_kata_package_version: "1.11.3-1"
+_zun_kata_enabled: True
 
 zun_docker_repo:
   - name: "docker-ce"
@@ -31,6 +32,7 @@ zun_docker_repo:
 zun_distro_packages:
   - git
   - systemd-devel
+  - tar
 
 zun_distro_compute_packages:
   - "containerd.io-{{ zun_containerd_package_version }}.el{{ ansible_facts['distribution_major_version'] }}.x86_64"

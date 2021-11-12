@@ -86,6 +86,7 @@ zun_kuryr_lock_path: "/var/lock/kuryr"
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
 zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
 zun_kata_package_version: "{{ _zun_kata_package_version }}"
+zun_kata_enabled: "{{ _zun_kata_enabled }}"
 
 # Set a list of users that are permitted to execute the docker binary.
 zun_docker_users:
@@ -362,7 +363,7 @@ zun_docker_init_defaults:
   Service:
     ExecStart:
       - ""
-      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %} --add-runtime kata=/usr/bin/kata-runtime"
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/usr/bin/kata-runtime{% endif %}"
 
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
