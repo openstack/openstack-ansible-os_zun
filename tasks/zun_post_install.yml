@@ -31,7 +31,7 @@
     - zun_services['zun-compute']['group'] in group_names
 
 - name: Generate zun config
-  config_template:
+  openstack.config_template.config_template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ zun_system_user_name }}"
@@ -61,7 +61,7 @@
     - zun-post-install
 
 - name: Implement policy.yaml if there are overrides configured
-  config_template:
+  openstack.config_template.config_template:
     content: "{{ zun_policy_overrides }}"
     dest: "/etc/zun/policy.yaml"
     config_type: yaml

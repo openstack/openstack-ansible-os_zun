@@ -137,7 +137,7 @@
     mode: "0755"
 
 - name: Generate kuryr config
-  config_template:
+  openstack.config_template.config_template:
     content: |
       {
         "live-restore": true,
@@ -209,7 +209,7 @@
     - zun-kuryr-dirs
 
 - name: Generate kuryr config
-  config_template:
+  openstack.config_template.config_template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "{{ zun_kuryr_system_user_name }}"
@@ -230,7 +230,7 @@
     - zun-post-install
 
 - name: Generate kuryr docker plugin config
-  config_template:
+  openstack.config_template.config_template:
     content: |
       {
         "Name": "kuryr",
