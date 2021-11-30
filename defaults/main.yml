@@ -68,9 +68,10 @@ zun_system_group_name: zun
 zun_system_shell: /bin/false
 zun_system_comment: zun system user
 zun_system_home_folder: "/var/lib/{{ zun_system_user_name }}"
+zun_system_slice_name: zun
 zun_log_dir: "/var/log/zun"
 
-zun_lock_path: "/var/lock/zun"
+zun_lock_dir: "{{ openstack_lock_dir | default('/run/lock') }}"
 
 ## Kuryr user information
 zun_kuryr_system_user_name: kuryr
@@ -79,8 +80,6 @@ zun_kuryr_system_shell: /bin/false
 zun_kuryr_system_comment: kuryr system user
 zun_kuryr_system_home_folder: "/var/lib/{{ zun_kuryr_system_user_name }}"
 zun_kuryr_log_dir: "/var/log/kuryr"
-
-zun_kuryr_lock_path: "/var/lock/kuryr"
 
 ## Docker setup information
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
