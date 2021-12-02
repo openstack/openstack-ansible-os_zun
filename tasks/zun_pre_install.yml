@@ -64,14 +64,12 @@
     - { path: "/etc/zun", mode: "0750" }
     - { path: "/etc/zun/rootwrap.d", owner: "root", group: "root" }
     - { path: "/etc/sudoers.d", mode: "0750", owner: "root", group: "root" }
-    - { path: "/var/cache/zun" }
     - { path: "{{ zun_system_home_folder }}" }
     - { path: "{{ zun_system_home_folder }}/.ssh", mode: "0700" }
     - { path: "{{ zun_system_home_folder }}/cache/api" }
     - { path: "{{ zun_system_home_folder }}/instances" }
     - { path: "{{ zun_system_home_folder }}/volumes" }
-    - { path: "{{ zun_lock_path }}" }
-    - { path: "/var/run/zun" }
+    - { path: "{{ zun_system_home_folder }}/images" }
   tags:
     - zun-dirs
 

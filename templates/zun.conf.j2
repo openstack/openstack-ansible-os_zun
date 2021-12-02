@@ -36,7 +36,7 @@ docker_remote_api_version = {{ zun_docker_api_version }}
 {% endif %}
 
 [glance]
-images_directory = /var/cache/zun/images
+images_directory = {{ zun_system_home_folder }}/images
 
 
 [glance_client]
@@ -80,7 +80,7 @@ insecure = {{ keystone_service_adminuri_insecure | bool }}
 
 
 [oslo_concurrency]
-lock_path = /var/lib/zun/tmp
+lock_path = {{ zun_lock_dir }}/{{ zun_system_slice_name }}
 
 
 [oslo_messaging_notifications]
@@ -116,7 +116,7 @@ enabled_filters = {{ zun_scheduler_default_filters }}
 [volume]
 use_multipath = true
 driver_list = cinder,local
-volume_dir = /var/lib/{{ zun_system_user_name }}/volumes
+volume_dir = {{ zun_system_home_folder }}/volumes
 
 
 [compute]

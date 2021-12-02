@@ -12,4 +12,4 @@ fi
 docker image prune -f
 
 # Clear old images from Zun cache directory
-find /var/cache/zun -amin +1440 -type f -exec rm -fv {} \;
+find {{ zun_system_home_folder }}/images -amin +1440 -type f -exec rm -fv {} \;
