@@ -23,7 +23,6 @@
       jobs:
         - openstack-ansible-deploy-aio_metal-centos-8
         - openstack-ansible-deploy-aio_metal-centos-8-stream
-        - openstack-ansible-deploy-aio_metal-ubuntu-bionic
         - openstack-ansible-deploy-aio_metal-ubuntu-focal
         - openstack-ansible-upgrade-aio_metal-centos-8-stream:
             voting: false
@@ -32,5 +31,4 @@
       jobs:
         - openstack-ansible-deploy-aio_metal-centos-8
         - openstack-ansible-deploy-aio_metal-centos-8-stream
-        - openstack-ansible-deploy-aio_metal-ubuntu-bionic
         - openstack-ansible-deploy-aio_metal-ubuntu-focal
