@@ -56,7 +56,12 @@
   tags:
     - zun-install
 
-- import_tasks: mq_setup.yml
+- include_role:
+    name: openstack.osa.mq_setup
+    apply:
+      tags:
+        - common-mq
+        - zun-config
   when:
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups[zun_services['zun-api']['group']] | intersect(ansible_play_hosts)) | list)[0]"
@@ -73,10 +78,14 @@
     _oslomsg_notify_transport: "{{ zun_oslomsg_notify_transport }}"
     _oslomsg_configure_notify: "{{ (zun_ceilometer_enabled | bool) or (zun_designate_enabled | bool) }}"
   tags:
-    - common-mq
-    - zun-config
+    - always
 
-- import_tasks: db_setup.yml
+- include_role:
+    name: openstack.osa.db_setup
+    apply:
+      tags:
+        - common-db
+        - zun-config
   vars:
     _oslodb_setup_host: "{{ zun_db_setup_host }}"
     _oslodb_ansible_python_interpreter: "{{ zun_db_setup_python_interpreter }}"
@@ -91,10 +100,14 @@
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
-    - common-db
-    - zun-config
+    - always
 
-- import_tasks: service_setup.yml
+- include_role:
+    name: openstack.osa.service_setup
+    apply:
+      tags:
+        - common-service
+        - zun-config
   vars:
     _service_adminuri_insecure: "{{ keystone_service_adminuri_insecure }}"
     _service_in_ldap: "{{ zun_service_in_ldap }}"
@@ -127,7 +140,7 @@
     - "zun_services['zun-api']['group'] in group_names"
     - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
   tags:
-    - zun-config
+    - always
 
 - import_tasks: zun_compute.yml
   when:
