@@ -257,7 +257,7 @@ zun_services:
     group: zun_compute
     service_name: kuryr-libnetwork
     condition: "{{ inventory_hostname in groups['zun_compute'] }}"
-    init_config_overrides: "{{ zun_kuryr_init_defaults | combine(zun_kuryr_init_overrides) }}"
+    init_config_overrides: "{{ zun_kuryr_init_defaults | combine(zun_kuryr_init_overrides, recursive=True) }}"
     start_order: 3
     wsgi_app: True
     wsgi: kuryr_libnetwork.server:app
@@ -308,7 +308,7 @@ zun_services:
     init_config_overrides: {}
     start_order: 4
     systemd_overrides_only: True
-    systemd_overrides: "{{ zun_docker_init_defaults | combine(zun_docker_init_overrides) }}"
+    systemd_overrides: "{{ zun_docker_init_defaults | combine(zun_docker_init_overrides, recursive=True) }}"
 
 # Common pip packages
 zun_pip_packages:
