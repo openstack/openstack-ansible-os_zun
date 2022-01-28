@@ -20,12 +20,14 @@
       - publish-openstack-docs-pti
       - build-release-notes-jobs-python3
     check:
-      jobs: []
-        #- openstack-ansible-deploy-aio_metal-centos-8-stream
-        #- openstack-ansible-deploy-aio_metal-ubuntu-focal
-        #- openstack-ansible-upgrade-aio_metal-centos-8-stream
-        #- openstack-ansible-upgrade-aio_metal-ubuntu-focal
+      jobs:
+        - openstack-ansible-deploy-aio_metal-centos-8-stream
+        - openstack-ansible-deploy-aio_metal-ubuntu-focal
+        - openstack-ansible-upgrade-aio_metal-centos-8-stream
+        - openstack-ansible-upgrade-aio_metal-ubuntu-focal
     gate:
-      jobs: []
-        #- openstack-ansible-deploy-aio_metal-centos-8-stream
-        #- openstack-ansible-deploy-aio_metal-ubuntu-focal
+      jobs:
+        - openstack-ansible-deploy-aio_metal-centos-8-stream
+        - openstack-ansible-deploy-aio_metal-ubuntu-focal
+        - openstack-ansible-upgrade-aio_metal-centos-8-stream
+        - openstack-ansible-upgrade-aio_metal-ubuntu-focal
