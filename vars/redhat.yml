@@ -25,7 +25,7 @@ zun_docker_repo:
     gpgkey: "https://download.docker.com/linux/centos/gpg"
   - name: "kata"
     description: Kata runtime
-    repo: "http://mirror.centos.org/centos/{{ ansible_facts['distribution_major_version'] }}/virt/$basearch/kata-containers"
+    repo: "https://vault.centos.org/8.5.2111/virt/$basearch/kata-containers"
     gpgkey: "http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-Official"
 
 # Common yum packages
