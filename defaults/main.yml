@@ -241,7 +241,6 @@ zun_service_in_ldap: "{{ service_ldap_backend_enabled | default(False) }}"
 
 zun_scheduler_default_filters: >-
   AvailabilityZoneFilter,
-  CPUFilter,
   ComputeFilter
 zun_scheduler_available_filters: zun.scheduler.filters.all_filters
 zun_scheduler_driver: filter_scheduler
