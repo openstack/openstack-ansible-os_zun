@@ -223,7 +223,6 @@
       config_overrides: "{{ zun_kuryr_conf_overrides }}"
       config_type: "ini"
   notify:
-    - Manage LB
     - Restart docker
   tags:
     - zun-config
