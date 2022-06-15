@@ -179,7 +179,12 @@ zun_service_project_name: "service"
 zun_service_project_domain_id: default
 zun_service_user_domain_id: default
 zun_service_user_name: "zun"
-zun_service_role_name: "admin"
+zun_service_role_names:
+  - admin
+  - service
+zun_service_token_roles:
+  - service
+zun_service_token_roles_required: "{{ openstack_service_token_roles_required | default(True) }}"
 
 ## Zun Auth for kuryr
 zun_kuryr_service_username: kuryr

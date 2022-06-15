@@ -123,10 +123,10 @@
     _service_users:
       - name: "{{ zun_service_user_name }}"
         password: "{{ zun_service_password }}"
-        role: "{{ zun_service_role_name }}"
+        role: "{{ zun_service_role_names }}"
       - name: "{{ zun_kuryr_service_username }}"
         password: "{{ zun_kuryr_service_password }}"
-        role: "{{ zun_service_role_name }}"
+        role: "{{ zun_service_role_names }}"
     _service_endpoints:
       - service: "{{ zun_service_name }}"
         interface: "public"
