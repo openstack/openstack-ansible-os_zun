@@ -64,11 +64,14 @@ memcached_servers = {{ zun_memcached_servers }}
 token_cache_time = 300
 memcache_security_strategy = ENCRYPT
 memcache_secret_key = {{ memcached_encryption_key }}
-service_token_roles_required = true
 auth_type = {{ zun_keystone_auth_plugin }}
 username = {{ zun_service_user_name }}
 user_domain_id = {{ zun_service_user_domain_id }}
 password = {{ zun_service_password }}
+
+service_token_roles_required = {{ zun_service_token_roles_required | bool }}
+service_token_roles = {{ zun_service_token_roles | join(',') }}
+service_type = {{ zun_service_type }}
 
 [network]
 driver = kuryr
