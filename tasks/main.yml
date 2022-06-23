@@ -184,13 +184,3 @@
   tags:
     - zun-config
     - systemd-service
-
-- name: Run the etcd service role
-  import_role:
-    name: etcd
-  vars:
-    etcd_cluster_group: "zun_api"
-  when:
-    - zun_services['zun-api']['group'] in group_names
-  tags:
-    - zun-config
