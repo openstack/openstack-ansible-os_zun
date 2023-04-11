@@ -81,6 +81,7 @@
   listen:
     - "Restart zun services"
     - "venv changed"
+    - "systemd service changed"
 
 - name: Start services
   systemd:
@@ -96,3 +97,4 @@
   listen:
     - "Restart zun services"
     - "venv changed"
+    - "systemd service changed"
