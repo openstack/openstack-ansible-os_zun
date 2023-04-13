@@ -84,8 +84,10 @@ zun_kuryr_log_dir: "/var/log/kuryr"
 ## Docker setup information
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
 zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
-zun_kata_package_version: "{{ _zun_kata_package_version }}"
-zun_kata_enabled: "{{ _zun_kata_enabled }}"
+zun_kata_package_version: "3.1.0"
+zun_kata_package_source: "https://github.com/kata-containers/kata-containers/releases/download/{{ zun_kata_package_version }}/kata-static-{{ zun_kata_package_version }}-x86_64.tar.xz"
+zun_kata_package_checksum: sha256:452cc850e021539c14359d016aba18ddba128f59aa9ab637738296d9b5cd78a0
+zun_kata_enabled: "True"
 
 # Set a list of users that are permitted to execute the docker binary.
 zun_docker_users:
@@ -367,7 +369,7 @@ zun_docker_init_defaults:
   Service:
     ExecStart:
       - ""
-      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['ansible_host'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/usr/bin/kata-runtime{% endif %}"
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['management_address'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}"
 
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
