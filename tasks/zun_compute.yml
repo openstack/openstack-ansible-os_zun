@@ -31,15 +31,6 @@
           - package: "containerd.io"
             version: "{{ zun_containerd_package_version }}"
             priority: 1000
-          - package: "kata-runtime"
-            version: "{{ zun_kata_package_version }}"
-            priority: 1000
-          - package: "kata-proxy"
-            version: "{{ zun_kata_package_version }}"
-            priority: 1000
-          - package: "kata-shim"
-            version: "{{ zun_kata_package_version }}"
-            priority: 1000
 
     - name: Get apt gpg key
       get_url:
@@ -110,23 +101,60 @@
     cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(cache_timeout, omit) }}"
     enablerepo: "{{ (ansible_facts['pkg_mgr'] == 'dnf') | ternary('extras', omit) }}"
 
-- name: Ensure the containerd config directory exists
-  file:
-    path: "/etc/containerd"
-    state: "directory"
-    owner: "root"
-    group: "root"
-    mode: "0755"
+- name: Install and configure katacontainers
+  when: zun_kata_enabled | bool
+  block:
+    - name: Download kata package
+      get_url:
+        url: "{{ zun_kata_package_source }}"
+        dest: "/opt/{{ zun_kata_package_source | basename }}"
+        mode: '0440'
+        checksum: "{{ zun_kata_package_checksum }}"
+      register: _kata_downloaded
 
-- name: Configure containerd
-  template:
-    src: "config.toml.j2"
-    dest: "/etc/containerd/config.toml"
-    mode: "0644"
-    owner: "root"
-    group: "root"
-  notify:
-    - Restart containerd
+    - name: Unpack package
+      unarchive:
+        src: "/opt/{{ zun_kata_package_source | basename }}"
+        dest: /opt/
+        remote_src: True
+        owner: root
+        group: root
+        extra_opts:
+          - --strip-components=2
+      when: _kata_downloaded is changed
+      notify:
+        - Restart containerd
+
+    - name: Symlink kata binaries to PATH
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+      with_items:
+        - src: /opt/kata/bin/containerd-shim-kata-v2
+          dest: /usr/local/bin/containerd-shim-kata-v2
+        - src: /opt/kata/bin/kata-collect-data.sh
+          dest: /usr/local/bin/kata-collect-data.sh
+        - src: /opt/kata/bin/kata-runtime
+          dest: /usr/local/bin/kata-runtime
+
+    - name: Ensure the containerd config directory exists
+      file:
+        path: "/etc/containerd"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+
+    - name: Configure containerd
+      template:
+        src: "config.toml.j2"
+        dest: "/etc/containerd/config.toml"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+      notify:
+        - Restart containerd
 
 - name: Ensure the Docker config directory exists
   file:
