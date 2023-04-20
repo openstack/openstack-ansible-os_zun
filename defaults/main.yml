@@ -284,6 +284,7 @@ zun_services:
     uwsgi_overrides: "{{ zun_uwsgi_conf_overrides }}"
     uwsgi_uid: "{{ zun_system_user_name }}"
     uwsgi_guid: "{{ zun_system_group_name }}"
+    uwsgi_tls: "{{ zun_backend_ssl | ternary(zun_uwsgi_tls, {}) }}"
   zun-compute:
     group: zun_compute
     service_name: zun-compute
@@ -351,6 +352,9 @@ zun_uwsgi_conf_overrides: {}
 zun_kuryr_uwsgi_conf_overrides:
   uwsgi:
     pyargv: --config-file /etc/kuryr/kuryr.conf
+zun_uwsgi_tls:
+  crt: "{{ zun_ssl_cert }}"
+  key: "{{ zun_ssl_key }}"
 
 ## Default zun+kuryr options used within the systemd unit file.
 zun_kuryr_init_defaults:
@@ -380,3 +384,51 @@ zun_kuryr_init_overrides: {}
 zun_docker_init_overrides: {}
 zun_docker_cleanup_init_overrides: {}
 zun_policy_overrides: {}
+
+###
+### Backend TLS
+###
+
+# Define if communication between haproxy and service backends should be
+# encrypted with TLS.
+zun_backend_ssl: "{{ openstack_service_backend_ssl | default(False) }}"
+
+# Storage location for SSL certificate authority
+zun_pki_dir: "{{ openstack_pki_dir | default('/etc/openstack_deploy/pki') }}"
+
+# Delegated host for operating the certificate authority
+zun_pki_setup_host: "{{ openstack_pki_setup_host | default('localhost') }}"
+
+# zun server certificate
+zun_pki_keys_path: "{{ zun_pki_dir ~ '/certs/private/' }}"
+zun_pki_certs_path: "{{ zun_pki_dir ~ '/certs/certs/' }}"
+zun_pki_intermediate_cert_name: "{{ openstack_pki_service_intermediate_cert_name | default('ExampleCorpIntermediate') }}"
+zun_pki_regen_cert: ''
+zun_pki_san: "{{ openstack_pki_san | default('DNS:' ~ ansible_facts['hostname'] ~ ',IP:' ~ management_address) }}"
+zun_pki_certificates:
+  - name: "zun_{{ ansible_facts['hostname'] }}"
+    provider: ownca
+    cn: "{{ ansible_facts['hostname'] }}"
+    san: "{{ zun_pki_san }}"
+    signed_by: "{{ zun_pki_intermediate_cert_name }}"
+
+# zun destination files for SSL certificates
+zun_ssl_cert: /etc/zun/zun.pem
+zun_ssl_key: /etc/zun/zun.key
+
+# Installation details for SSL certificates
+zun_pki_install_certificates:
+  - src: "{{ zun_user_ssl_cert | default(zun_pki_certs_path ~ 'zun_' ~ ansible_facts['hostname'] ~ '-chain.crt') }}"
+    dest: "{{ zun_ssl_cert }}"
+    owner: "{{ zun_system_user_name }}"
+    group: "{{ zun_system_user_name }}"
+    mode: "0644"
+  - src: "{{ zun_user_ssl_key | default(zun_pki_keys_path ~ 'zun_' ~ ansible_facts['hostname'] ~ '.key.pem') }}"
+    dest: "{{ zun_ssl_key }}"
+    owner: "{{ zun_system_user_name }}"
+    group: "{{ zun_system_user_name }}"
+    mode: "0600"
+
+# Define user-provided SSL certificates
+#zun_user_ssl_cert: <path to cert on ansible deployment host>
+#zun_user_ssl_key: <path to cert on ansible deployment host>
