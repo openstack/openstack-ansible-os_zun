@@ -10,10 +10,11 @@ default_image_driver = docker
 capsule_driver = docker
 container_runtime = {{ zun_container_runtime }}
 
+my_ip = {{ zun_service_address }}
+
 
 [api]
 port = {{ zun_service_port }}
-host_ip = {{ ansible_host }}
 workers = {{ zun_api_threads }}
 
 
