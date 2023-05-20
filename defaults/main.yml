@@ -364,12 +364,18 @@ zun_kuryr_init_defaults:
     Group: "{{ zun_kuryr_system_group_name }}"
     User: "{{ zun_kuryr_system_user_name }}"
 
+# Key-value storage for docker swarm standalone mode.
+# Possible options: zk, etcd and consul
+zun_docker_kv_storage: etcd
+zun_docker_kv_port: 2379
+zun_docker_kv_group: zun_api
+
 ## Default zun+docker options used within the systemd unit file.
 zun_docker_init_defaults:
   Service:
     ExecStart:
       - ""
-      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store etcd://{% for item in groups['zun_api'] %}{{ hostvars[item]['management_address'] }}:2379{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}"
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store {{ zun_docker_kv_storage }}://{% for item in groups[zun_docker_kv_group] %}{{ hostvars[item]['management_address'] }}:{{ zun_docker_kv_port }}{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}"
 
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
