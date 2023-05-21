@@ -33,6 +33,26 @@
   tags:
     - zun-install
 
+- name: Create and install SSL certificates
+  include_role:
+    name: pki
+    tasks_from: main_certs.yml
+    apply:
+      tags:
+        - zun-config
+        - pki
+  vars:
+    pki_setup_host: "{{ zun_pki_setup_host }}"
+    pki_dir: "{{ zun_pki_dir }}"
+    pki_create_certificates: "{{ zun_user_ssl_cert is not defined and zun_user_ssl_key is not defined }}"
+    pki_regen_cert: "{{ zun_pki_regen_cert }}"
+    pki_certificates: "{{ zun_pki_certificates }}"
+    pki_install_certificates: "{{ zun_pki_install_certificates }}"
+  when:
+    - zun_backend_ssl
+  tags:
+    - always
+
 # NOTE(jrosser)
 # kuryr-lib appears in u-c and the new pip resolver will fail to install
 # if two contradictory constraints are given which will always happen
