@@ -29,7 +29,8 @@
   tags:
     - always
 
-- import_tasks: zun_pre_install.yml
+- name: Importing zun_pre_install tasks
+  import_tasks: zun_pre_install.yml
   tags:
     - zun-install
 
@@ -81,7 +82,8 @@
   tags:
     - zun-install
 
-- include_role:
+- name: Including osa.mq_setup role
+  include_role:
     name: openstack.osa.mq_setup
     apply:
       tags:
@@ -105,7 +107,8 @@
   tags:
     - always
 
-- include_role:
+- name: Including osa.db_setup role
+  include_role:
     name: openstack.osa.db_setup
     apply:
       tags:
@@ -127,7 +130,8 @@
   tags:
     - always
 
-- include_role:
+- name: Including osa.service_setup role
+  include_role:
     name: openstack.osa.service_setup
     apply:
       tags:
@@ -167,13 +171,15 @@
   tags:
     - always
 
-- import_tasks: zun_compute.yml
+- name: Importing zun_post_install tasks
+  import_tasks: zun_compute.yml
   when:
     - "zun_services['zun-compute']['group'] in group_names"
   tags:
     - zun-compute
 
-- import_tasks: zun_post_install.yml
+- name: Importing zun_post_install tasks
+  import_tasks: zun_post_install.yml
   tags:
     - zun-config
 
@@ -196,10 +202,10 @@
     systemd_tempd_prefix: openstack
     systemd_slice_name: "{{ zun_system_slice_name }}"
     systemd_lock_dir: "{{ zun_lock_dir }}"
-    systemd_CPUAccounting: true
-    systemd_BlockIOAccounting: true
-    systemd_MemoryAccounting: true
-    systemd_TasksAccounting: true
+    systemd_service_cpu_accounting: true
+    systemd_service_block_io_accounting: true
+    systemd_service_memory_accounting: true
+    systemd_service_tasks_accounting: true
     systemd_services: "{{ filtered_zun_services }}"
   tags:
     - zun-config

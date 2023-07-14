@@ -18,7 +18,9 @@ _zun_containerd_package_version: "1.6.20-1"
 
 zun_docker_repo:
   - name: "docker-ce"
-    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] | lower }} stable"
+    repo: >-
+      deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{
+        ansible_facts['distribution_release'] | lower }} stable
     gpg_uri: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg"
 
 # Common apt packages

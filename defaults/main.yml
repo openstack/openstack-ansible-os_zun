@@ -26,14 +26,18 @@ zun_ceilometer_enabled: "{{ (groups['ceilometer_all'] is defined) and (groups['c
 ## Verbosity Options
 debug: False
 
-#python venv executable
+# python venv executable
 zun_venv_python_executable: "{{ openstack_venv_python_executable | default('python3') }}"
 
 # Set the host which will execute the shade modules
 # for the service setup. The host must already have
 # clouds.yaml properly configured.
 zun_service_setup_host: "{{ openstack_service_setup_host | default('localhost') }}"
-zun_service_setup_host_python_interpreter: "{{ openstack_service_setup_host_python_interpreter | default((zun_service_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_facts['python']['executable'])) }}"
+zun_service_setup_host_python_interpreter: >-
+  {{
+    openstack_service_setup_host_python_interpreter | default(
+      (zun_service_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_facts['python']['executable']))
+  }}
 
 # Set the package install state for distribution packages
 # Options are 'present' and 'latest'
@@ -50,7 +54,8 @@ zun_kuryr_git_install_branch: master
 zun_kuryr_lib_git_repo: https://opendev.org/openstack/kuryr
 zun_kuryr_lib_git_install_branch: master
 
-zun_upper_constraints_url: "{{ requirements_git_url | default('https://releases.openstack.org/constraints/upper/' ~ requirements_git_install_branch | default('master')) }}"
+zun_upper_constraints_url: >-
+  {{ requirements_git_url | default('https://releases.openstack.org/constraints/upper/' ~ requirements_git_install_branch | default('master')) }}
 zun_git_constraints:
   - "--constraint {{ zun_upper_constraints_url }}"
 
@@ -85,7 +90,8 @@ zun_kuryr_log_dir: "/var/log/kuryr"
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
 zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
 zun_kata_package_version: "3.1.0"
-zun_kata_package_source: "https://github.com/kata-containers/kata-containers/releases/download/{{ zun_kata_package_version }}/kata-static-{{ zun_kata_package_version }}-x86_64.tar.xz"
+zun_kata_package_source: >-
+  https://github.com/kata-containers/kata-containers/releases/download/{{ zun_kata_package_version }}/kata-static-{{ zun_kata_package_version }}-x86_64.tar.xz
 zun_kata_package_checksum: sha256:452cc850e021539c14359d016aba18ddba128f59aa9ab637738296d9b5cd78a0
 zun_kata_enabled: "True"
 
@@ -124,7 +130,11 @@ zun_docker_prune_frequency: hour
 
 ## Database info
 zun_db_setup_host: "{{ openstack_db_setup_host | default('localhost') }}"
-zun_db_setup_python_interpreter: "{{ openstack_db_setup_python_interpreter | default((zun_db_setup_host == 'localhost') | ternary(ansible_playbook_python, ansible_facts['python']['executable'])) }}"
+zun_db_setup_python_interpreter: >-
+  {{
+    openstack_db_setup_python_interpreter | default((zun_db_setup_host == 'localhost') | ternary(
+      ansible_playbook_python, ansible_facts['python']['executable']))
+  }}
 zun_galera_address: "{{ galera_address | default('127.0.0.1') }}"
 zun_galera_user: zun
 zun_galera_database: zun
@@ -173,7 +183,7 @@ zun_oslomsg_notify_ssl_version: "{{ oslomsg_notify_ssl_version | default('TLSv1_
 zun_oslomsg_notify_ssl_ca_file: "{{ oslomsg_notify_ssl_ca_file | default('') }}"
 
 # If this is not set, then the playbook will try to guess it.
-#zun_virt_type: kvm
+# zun_virt_type: kvm
 
 ## Zun Auth
 zun_service_region: "{{ service_region | default('RegionOne') }}"
@@ -242,7 +252,8 @@ zun_container_runtime: runc
 
 ## Cap the maximun number of threads / workers when a user value is unspecified.
 zun_api_threads_max: 16
-zun_api_threads: "{{ [[(ansible_facts['processor_vcpus']//ansible_facts['processor_threads_per_core'])|default(1), 1] | max * 2, zun_api_threads_max] | min }}"
+zun_api_threads: >-
+  {{ [[(ansible_facts['processor_vcpus'] // ansible_facts['processor_threads_per_core']) | default(1), 1] | max * 2, zun_api_threads_max] | min }}
 
 zun_service_in_ldap: "{{ service_ldap_backend_enabled | default(False) }}"
 
@@ -255,7 +266,7 @@ zun_scheduler_driver: filter_scheduler
 ## uWSGI setup
 zun_wsgi_threads: 1
 zun_wsgi_processes_max: 16
-zun_wsgi_processes: "{{ [[ansible_facts['processor_vcpus']|default(1), 1] | max * 2, zun_wsgi_processes_max] | min }}"
+zun_wsgi_processes: "{{ [[ansible_facts['processor_vcpus'] | default(1), 1] | max * 2, zun_wsgi_processes_max] | min }}"
 
 ## Service Name-Group Mapping
 zun_services:
@@ -307,7 +318,7 @@ zun_services:
       state: started
       options:
         OnBootSec: 30min
-        OnCalendar: "{{ (zun_docker_prune_frequency == 'day') | ternary('daily', zun_docker_prune_frequency+'ly') }}"
+        OnCalendar: "{{ (zun_docker_prune_frequency == 'day') | ternary('daily', zun_docker_prune_frequency + 'ly') }}"
         Persistent: true
   docker:
     group: zun_compute
@@ -379,7 +390,7 @@ zun_docker_init_defaults:
   Service:
     ExecStart:
       - ""
-      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store {{ zun_docker_kv_storage }}://{% for item in groups[zun_docker_kv_group] %}{{ hostvars[item]['management_address'] }}:{{ zun_docker_kv_port }}{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}"
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store {{ zun_docker_kv_storage }}://{% for item in groups[zun_docker_kv_group] %}{{ hostvars[item]['management_address'] }}:{{ zun_docker_kv_port }}{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}" # noqa: yaml[line-length]
 
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
@@ -436,5 +447,5 @@ zun_pki_install_certificates:
     mode: "0600"
 
 # Define user-provided SSL certificates
-#zun_user_ssl_cert: <path to cert on ansible deployment host>
-#zun_user_ssl_key: <path to cert on ansible deployment host>
+# zun_user_ssl_cert: <path to cert on ansible deployment host>
+# zun_user_ssl_key: <path to cert on ansible deployment host>

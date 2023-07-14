@@ -36,7 +36,7 @@
       get_url:
         url: "{{ item.gpg_uri }}"
         dest: "/tmp/{{ item.name }}"
-        mode: 0440
+        mode: "0440"
       with_items: "{{ zun_docker_repo }}"
 
     - name: Add Apt signing key on remote server to keyring
@@ -314,6 +314,7 @@
   file:
     path: "/var/tmp/zun-docker-cleanup.disabled"
     state: "{{ zun_docker_prune_images | ternary('absent', 'touch') }}"
+    mode: "0644"
 
 - name: Remove legacy systemd docker override
   file:
