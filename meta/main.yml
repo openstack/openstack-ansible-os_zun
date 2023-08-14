@@ -18,22 +18,23 @@ galaxy_info:
   description: Installation and setup of zun
   company: Rackspace
   license: Apache2
-  min_ansible_version: 2.4
+  role_name: os_zun
+  namespace: openstack
+  min_ansible_version: "2.10"
   platforms:
     - name: Debian
       versions:
-        - buster
+        - bullseye
     - name: Ubuntu
       versions:
         - focal
+        - jammy
     - name: EL
       versions:
-        - 8
-  categories:
+        - "9"
+  galaxy_tags:
     - cloud
     - python
     - zun
     - development
     - openstack
-dependencies:
-  - apt_package_pinning
