@@ -22,20 +22,6 @@
   tags:
     - zun-group
 
-- name: Remove old key file(s) if found
-  file:
-    path: "{{ item }}"
-    state: "absent"
-  with_items:
-    - "{{ zun_system_home_folder }}/.ssh/authorized_keys"
-    - "{{ zun_system_home_folder }}/.ssh/id_rsa"
-    - "{{ zun_system_home_folder }}/.ssh/id_rsa.pub"
-  when:
-    - zun_recreate_keys | bool
-  tags:
-    - zun-key
-    - zun-key-create
-
 - name: Create the zun system user
   user:
     name: "{{ zun_system_user_name }}"
@@ -46,11 +32,8 @@
     system: "yes"
     createhome: "yes"
     home: "{{ zun_system_home_folder }}"
-    generate_ssh_key: "yes"
   tags:
     - zun-user
-    - zun-key
-    - zun-key-create
 
 - name: Create zun dir
   file:

@@ -230,10 +230,6 @@ zun_service_internaluri: "{{ zun_service_internaluri_proto }}://{{ internal_lb_v
 zun_service_internalurl: "{{ zun_service_internaluri }}"
 zun_service_endpoint_type: internalURL
 
-# If you want to regenerate the zun users SSH keys, on each run, set this var to True
-# Otherwise keys will be generated on the first run and not regenerated each run.
-zun_recreate_keys: False
-
 ## General Zun configuration
 # Select between the 'runc' or 'kata' runtime
 zun_container_runtime: runc
