@@ -17,4 +17,4 @@
   tags:
     - zun
   roles:
-   - role: "os_zun"
+    - role: "os_zun"
