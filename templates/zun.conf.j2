@@ -2,7 +2,7 @@
 debug = {{ debug | bool }}
 use_journal = true
 rpc_conn_pool_size = {{ zun_rpc_conn_pool_size }}
-transport_url = {{ zun_oslomsg_rpc_transport }}://{% for host in zun_oslomsg_rpc_servers.split(',') %}{{ zun_oslomsg_rpc_userid }}:{{ zun_oslomsg_rpc_password }}@{{ host }}:{{ zun_oslomsg_rpc_port }}{% if not loop.last %},{% else %}/{{ zun_oslomsg_rpc_vhost }}{% if zun_oslomsg_rpc_use_ssl | bool %}?ssl=1&ssl_version={{ zun_oslomsg_rpc_ssl_version }}&ssl_ca_file={{ zun_oslomsg_rpc_ssl_ca_file }}{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
+transport_url = {{ zun_oslomsg_rpc_transport }}://{% for host in zun_oslomsg_rpc_servers.split(',') %}{{ zun_oslomsg_rpc_userid }}:{{ zun_oslomsg_rpc_password }}@{{ host }}:{{ zun_oslomsg_rpc_port }}{% if not loop.last %},{% else %}/{{ _zun_oslomsg_rpc_vhost_conf }}{% if zun_oslomsg_rpc_use_ssl | bool %}?ssl=1&ssl_version={{ zun_oslomsg_rpc_ssl_version }}&ssl_ca_file={{ zun_oslomsg_rpc_ssl_ca_file }}{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
 
 use_sandbox = true
 image_driver_list = glance,docker
@@ -89,7 +89,7 @@ lock_path = {{ zun_lock_dir }}/{{ zun_system_slice_name }}
 
 [oslo_messaging_notifications]
 driver = {{ (zun_ceilometer_enabled | bool) | ternary('messagingv2', 'noop') }}
-transport_url = {{ zun_oslomsg_notify_transport }}://{% for host in zun_oslomsg_notify_servers.split(',') %}{{ zun_oslomsg_notify_userid }}:{{ zun_oslomsg_notify_password }}@{{ host }}:{{ zun_oslomsg_notify_port }}{% if not loop.last %},{% else %}/{{ zun_oslomsg_notify_vhost }}{% if zun_oslomsg_notify_use_ssl | bool %}?ssl=1&ssl_version={{ zun_oslomsg_notify_ssl_version }}&ssl_ca_file={{ zun_oslomsg_notify_ssl_ca_file }}{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
+transport_url = {{ zun_oslomsg_notify_transport }}://{% for host in zun_oslomsg_notify_servers.split(',') %}{{ zun_oslomsg_notify_userid }}:{{ zun_oslomsg_notify_password }}@{{ host }}:{{ zun_oslomsg_notify_port }}{% if not loop.last %},{% else %}/{{ _zun_oslomsg_notify_vhost_conf }}{% if zun_oslomsg_notify_use_ssl | bool %}?ssl=1&ssl_version={{ zun_oslomsg_notify_ssl_version }}&ssl_ca_file={{ zun_oslomsg_notify_ssl_ca_file }}{% else %}?ssl=0{% endif %}{% endif %}{% endfor %}
 {% if zun_ceilometer_enabled or zun_designate_enabled %}
 {% set notification_topics = [] %}
 {% if zun_ceilometer_enabled %}
@@ -104,7 +104,9 @@ topics = {{ notification_topics | join(',') }}
 
 [oslo_messaging_rabbit]
 ssl = {{ zun_oslomsg_notify_use_ssl | bool }}
-
+rabbit_quorum_queue = {{ zun_oslomsg_rabbit_quorum_queues }}
+rabbit_quorum_delivery_limit = {{ zun_oslomsg_rabbit_quorum_delivery_limit }}
+rabbit_quorum_max_memory_bytes = {{ zun_oslomsg_rabbit_quorum_max_memory_bytes }}
 
 [placement_client]
 endpoint_type = {{ zun_service_endpoint_type }}
