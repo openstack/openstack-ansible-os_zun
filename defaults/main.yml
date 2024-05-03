@@ -177,6 +177,7 @@ zun_oslomsg_rpc_ssl_ca_file: "{{ oslomsg_rpc_ssl_ca_file | default('') }}"
 zun_oslomsg_rpc_policies: []
 
 # Notify
+zun_oslomsg_notify_configure: "{{ oslomsg_notify_configure | default(zun_ceilometer_enabled or zun_designate_enabled) }}"
 zun_oslomsg_notify_host_group: "{{ oslomsg_notify_host_group | default('rabbitmq_all') }}"
 zun_oslomsg_notify_setup_host: "{{ (zun_oslomsg_notify_host_group in groups) | ternary(groups[zun_oslomsg_notify_host_group][0], 'localhost') }}"
 zun_oslomsg_notify_transport: "{{ oslomsg_notify_transport | default('rabbit') }}"
