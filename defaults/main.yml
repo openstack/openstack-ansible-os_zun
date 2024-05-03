@@ -193,6 +193,10 @@ zun_oslomsg_notify_policies: []
 
 ## RabbitMQ integration
 zun_oslomsg_rabbit_quorum_queues: "{{ oslomsg_rabbit_quorum_queues | default(True) }}"
+zun_oslomsg_rabbit_stream_fanout: "{{ oslomsg_rabbit_stream_fanout | default(zun_oslomsg_rabbit_quorum_queues) }}"
+zun_oslomsg_rabbit_transient_quorum_queues: "{{ oslomsg_rabbit_transient_quorum_queues | default(zun_oslomsg_rabbit_stream_fanout) }}"
+zun_oslomsg_rabbit_qos_prefetch_count: "{{ oslomsg_rabbit_qos_prefetch_count | default(zun_oslomsg_rabbit_stream_fanout | ternary(10, 0)) }}"
+zun_oslomsg_rabbit_queue_manager: "{{ oslomsg_rabbit_queue_manager | default(zun_oslomsg_rabbit_quorum_queues) }}"
 zun_oslomsg_rabbit_quorum_delivery_limit: "{{ oslomsg_rabbit_quorum_delivery_limit | default(0) }}"
 zun_oslomsg_rabbit_quorum_max_memory_bytes: "{{ oslomsg_rabbit_quorum_max_memory_bytes | default(0) }}"
 
