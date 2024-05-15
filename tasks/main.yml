@@ -182,6 +182,7 @@
   import_tasks: zun_post_install.yml
   tags:
     - zun-config
+    - post-install
 
 - name: Import uwsgi role
   import_role:
