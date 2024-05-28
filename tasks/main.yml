@@ -106,6 +106,7 @@
     _oslomsg_notify_transport: "{{ zun_oslomsg_notify_transport }}"
     _oslomsg_configure_notify: "{{ (zun_ceilometer_enabled | bool) or (zun_designate_enabled | bool) }}"
     _oslomsg_notify_policies: "{{ zun_oslomsg_notify_policies }}"
+    _oslomsg_notify_configure: "{{ zun_oslomsg_notify_configure }}"
   tags:
     - always
 
