@@ -90,8 +90,7 @@
         - common-mq
         - zun-config
   when:
-    - "zun_services['zun-api']['group'] in group_names"
-    - "inventory_hostname == ((groups[zun_services['zun-api']['group']] | intersect(ansible_play_hosts)) | list)[0]"
+    - _zun_is_first_play_host
   vars:
     _oslomsg_rpc_setup_host: "{{ zun_oslomsg_rpc_setup_host }}"
     _oslomsg_rpc_userid: "{{ zun_oslomsg_rpc_userid }}"
@@ -128,8 +127,7 @@
           - username: "{{ zun_galera_user }}"
             password: "{{ zun_galera_password }}"
   when:
-    - "zun_services['zun-api']['group'] in group_names"
-    - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
+    - _zun_is_first_play_host
   tags:
     - always
 
@@ -169,8 +167,7 @@
         type: "{{ zun_service_type }}"
         description: "{{ zun_service_description }}"
   when:
-    - "zun_services['zun-api']['group'] in group_names"
-    - "inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]"
+    - _zun_is_first_play_host
   tags:
     - always
 

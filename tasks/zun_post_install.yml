@@ -84,5 +84,4 @@
   become_user: "{{ zun_system_user_name }}"
   changed_when: false
   when:
-    - zun_services['zun-api']['group'] in group_names
-    - inventory_hostname == ((groups['zun_api'] | intersect(ansible_play_hosts)) | list)[0]
+    - _zun_is_first_play_host
