@@ -16,12 +16,21 @@
 _zun_docker_package_version: "5:20.10.24~*"
 _zun_containerd_package_version: "1.6.20-1"
 
+_zun_architecture_mapping:
+  x86_64: amd64
+  ppc64le: ppc64el
+  s390x: s390x
+  armv7l: armhf
+  aarch64: arm64
+
 zun_docker_repo:
   - name: "docker-ce"
-    repo: >-
-      deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{
-        ansible_facts['distribution_release'] | lower }} stable
-    gpg_uri: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg"
+    suites: "{{ ansible_facts['distribution_release'] | lower }}"
+    uris: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}"
+    signed_by: "{{ lookup('file', 'gpg/0EBFCD88') }}"
+    components: stable
+    architectures: "{{ _zun_architecture_mapping.get(ansible_facts['architecture']) }}"
+    state: present
 
 # Common apt packages
 zun_distro_packages:
