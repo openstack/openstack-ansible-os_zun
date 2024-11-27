@@ -135,7 +135,7 @@
         checksum: "{{ zun_kata_package_checksum }}"
       register: _kata_downloaded
 
-    - name: Unpack package
+    - name: Unpack package  # noqa: no-handler
       ansible.builtin.unarchive:
         src: "/opt/{{ zun_kata_package_source | basename }}"
         dest: /opt/

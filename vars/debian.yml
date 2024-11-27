@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_zun_docker_package_version: "5:20.10.24~*"
-_zun_containerd_package_version: "1.6.20-1"
+_zun_docker_package_version: "5:27.5.1-1~*"
+_zun_containerd_package_version: "1.7.27-1"
 
 _zun_architecture_mapping:
   x86_64: amd64

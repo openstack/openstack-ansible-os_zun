@@ -10,8 +10,10 @@ bindir = {{ zun_bin | dirname }}/libexec/kuryr
 # Kuryr URL for accessing Kuryr through json rpc. (string value)
 kuryr_uri = http://{{ zun_kuryr_service_address }}:{{ zun_kuryr_service_port }}
 
+{% if zun_docker_kv_storage %}
 # Kuryr plugin scope reported to libnetwork. (string value)
 capability_scope = global
+{% endif %}
 
 # Do processing external connectivity (boolean value)
 process_external_connectivity = false

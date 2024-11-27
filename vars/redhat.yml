@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_zun_docker_package_version: "20.10.24-3"
-_zun_containerd_package_version: "1.6.20-3.1"
+_zun_docker_package_version: "27.5.1-1"
+_zun_containerd_package_version: "1.7.27-3.1"
 
 zun_docker_repo:
   - name: "docker-ce"

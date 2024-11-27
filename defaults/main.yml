@@ -87,10 +87,10 @@ zun_kuryr_log_dir: "/var/log/kuryr"
 ## Docker setup information
 zun_docker_package_version: "{{ _zun_docker_package_version }}"
 zun_containerd_package_version: "{{ _zun_containerd_package_version }}"
-zun_kata_package_version: "3.1.0"
+zun_kata_package_version: "3.16.0"
 zun_kata_package_source: >-
-  https://github.com/kata-containers/kata-containers/releases/download/{{ zun_kata_package_version }}/kata-static-{{ zun_kata_package_version }}-x86_64.tar.xz
-zun_kata_package_checksum: sha256:452cc850e021539c14359d016aba18ddba128f59aa9ab637738296d9b5cd78a0
+  https://github.com/kata-containers/kata-containers/releases/download/{{ zun_kata_package_version }}/kata-static-{{ zun_kata_package_version }}-amd64.tar.xz
+zun_kata_package_checksum: sha256:56cb69a7bb6d3364e92155e06283972e71654a88c70816a55f891f209a8f74db
 zun_kata_enabled: "True"
 
 # Set a list of users that are permitted to execute the docker binary.
@@ -385,8 +385,8 @@ zun_kuryr_init_defaults:
     User: "{{ zun_kuryr_system_user_name }}"
 
 # Key-value storage for docker swarm standalone mode.
-# Possible options: zk, etcd and consul
-zun_docker_kv_storage: etcd
+# Possible options: zk, etcd, consul and null to disable swarm mode
+zun_docker_kv_storage: null
 zun_docker_kv_port: 2379
 zun_docker_kv_group: zun_api
 
@@ -395,7 +395,7 @@ zun_docker_init_defaults:
   Service:
     ExecStart:
       - ""
-      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock --cluster-store {{ zun_docker_kv_storage }}://{% for item in groups[zun_docker_kv_group] %}{{ hostvars[item]['management_address'] }}:{{ zun_docker_kv_port }}{% if not loop.last %},{% endif %}{% endfor %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}" # noqa: yaml[line-length]
+      - "/usr/bin/dockerd --group {{ zun_system_group_name }} -H tcp://{{ zun_docker_bind_host }}:{{ zun_docker_bind_port }} -H unix:///var/run/docker.sock {% if zun_docker_kv_storage %}--cluster-store {{ zun_docker_kv_storage }}://{% for item in groups[zun_docker_kv_group] %}{{ hostvars[item]['management_address'] }}:{{ zun_docker_kv_port }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}{% if zun_kata_enabled %} --add-runtime kata=/opt/kata/bin/kata-runtime{% endif %}" # noqa: yaml[line-length]
 
 ## Tunable overrides for service unit files.
 zun_api_paste_ini_overrides: {}
