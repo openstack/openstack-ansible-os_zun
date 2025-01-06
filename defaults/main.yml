@@ -355,14 +355,7 @@ zun_pip_packages:
   - pymysql
   - systemd-python
 
-## (Qdrouterd) integration
-# TODO(ansmith): Change structure when more backends will be supported
-zun_oslomsg_amqp1_enabled: "{{ zun_oslomsg_rpc_transport == 'amqp' }}"
-
 zun_memcached_servers: "{{ memcached_servers }}"
-
-zun_optional_oslomsg_amqp1_pip_packages:
-  - oslo.messaging[amqp1]
 
 ## Default service options used within all systemd unit files.
 zun_service_defaults: {}

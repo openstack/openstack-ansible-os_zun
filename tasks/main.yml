@@ -74,7 +74,7 @@
     venv_install_destination_path: "{{ zun_bin | dirname }}"
     venv_install_distro_package_list: "{{ zun_distro_packages }}"
     venv_pip_install_args: "{{ zun_pip_install_args }}"
-    venv_pip_packages: "{{ zun_pip_packages | union((zun_oslomsg_amqp1_enabled | bool) | ternary(zun_optional_oslomsg_amqp1_pip_packages, [])) }}"
+    venv_pip_packages: "{{ zun_pip_packages }}"
     venv_facts_when_changed:
       - section: "zun"
         option: "venv_tag"
