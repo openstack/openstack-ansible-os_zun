@@ -80,7 +80,7 @@
 
 - name: Synchronize the zun DB schema
   command: "{{ zun_bin }}/zun-db-manage --config-dir /etc/zun upgrade"
-  become: yes
+  become: true
   become_user: "{{ zun_system_user_name }}"
   changed_when: false
   when:

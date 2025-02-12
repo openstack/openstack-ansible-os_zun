@@ -16,9 +16,9 @@
 - name: Stop containerd
   systemd:
     name: "containerd"
-    enabled: yes
+    enabled: true
     state: "stopped"
-    daemon_reload: yes
+    daemon_reload: true
   register: _stop
   until: _stop is success
   retries: 5
@@ -28,9 +28,9 @@
 - name: Start containerd
   systemd:
     name: "containerd"
-    enabled: yes
+    enabled: true
     state: "started"
-    daemon_reload: yes
+    daemon_reload: true
   register: _start
   until: _start is success
   retries: 5
@@ -40,9 +40,9 @@
 - name: Stop docker
   systemd:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: "stopped"
-    daemon_reload: yes
+    daemon_reload: true
   with_items:
     - docker
     - kuryr-libnetwork
@@ -55,9 +55,9 @@
 - name: Start docker
   systemd:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: "started"
-    daemon_reload: yes
+    daemon_reload: true
   with_items:
     - kuryr-libnetwork
     - docker
@@ -70,9 +70,9 @@
 - name: Stop services
   systemd:
     name: "{{ item.service_name }}"
-    enabled: yes
+    enabled: true
     state: "stopped"
-    daemon_reload: yes
+    daemon_reload: true
   with_items: "{{ filtered_zun_services }}"
   register: _stop
   until: _stop is success
@@ -87,9 +87,9 @@
 - name: Start services
   systemd:
     name: "{{ item.service_name }}"
-    enabled: yes
+    enabled: true
     state: "started"
-    daemon_reload: yes
+    daemon_reload: true
   with_items: "{{ filtered_zun_services }}"
   register: _start
   until: _start is success

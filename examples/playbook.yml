@@ -1,14 +1,13 @@
 ---
-
 - name: Gather zun facts
   hosts: zun_all
-  gather_facts: True
+  gather_facts: true
   tags:
     - always
 
 - name: Install zun services
   hosts: zun_all
-  gather_facts: False
+  gather_facts: false
   serial:
     - 1
     - "100%"

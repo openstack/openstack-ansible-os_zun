@@ -79,7 +79,7 @@
 
     - name: Update Apt cache
       apt:
-        update_cache: yes
+        update_cache: true
       when: (add_nv_repos is changed) or (_cleanup_apt_repositories is changed)
       register: update_apt_cache
       until: update_apt_cache is success
@@ -95,8 +95,8 @@
     description: "{{ item.description }}"
     baseurl: "{{ item.repo }}"
     gpgkey: "{{ item.gpgkey | default(omit) }}"
-    gpgcheck: yes
-    enabled: yes
+    gpgcheck: true
+    enabled: true
     priority: 25
   register: add_docker_repos
   until: add_docker_repos is success
@@ -131,7 +131,7 @@
       get_url:
         url: "{{ zun_kata_package_source }}"
         dest: "/opt/{{ zun_kata_package_source | basename }}"
-        mode: '0440'
+        mode: "0440"
         checksum: "{{ zun_kata_package_checksum }}"
       register: _kata_downloaded
 
@@ -139,7 +139,7 @@
       unarchive:
         src: "/opt/{{ zun_kata_package_source | basename }}"
         dest: /opt/
-        remote_src: True
+        remote_src: true
         owner: root
         group: root
         extra_opts:
@@ -282,7 +282,7 @@
   user:
     name: "{{ item }}"
     groups: "{{ zun_docker_groupname }}"
-    append: yes
+    append: true
   with_items: "{{ zun_docker_users }}"
 
 - name: Drop sudoers file
@@ -306,7 +306,7 @@
   systemd:
     name: multipathd
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Create script to clean up old Docker data
   template:

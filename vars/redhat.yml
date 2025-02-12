@@ -22,7 +22,6 @@ zun_docker_repo:
     repo: "https://download.docker.com/linux/centos/{{ ansible_facts['distribution_major_version'] }}/$basearch/stable"
     gpgkey: "https://download.docker.com/linux/centos/gpg"
 
-
 # Common yum packages
 zun_distro_packages:
   - git
