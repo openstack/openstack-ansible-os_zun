@@ -16,7 +16,7 @@
 - name: Run apt install block
   block:
     - name: Run the apt package pinning role
-      include_role:
+      ansible.builtin.include_role:
         name: apt_package_pinning
       vars:
         apt_package_pinning_file_name: "docker.pref"
@@ -41,13 +41,13 @@
 
     # NOTE(jrosser) remove this task for the 2025.2 release
     - name: Clean up legacy repository config not in deb822 format
-      file:
+      ansible.builtin.file:
         path: "/etc/apt/sources.list.d/docker-ce.list"
         state: absent
       register: _cleanup_apt_repositories
 
     - name: Ensure python3-debian package is available
-      apt:
+      ansible.builtin.apt:
         name: python3-debian
 
     - name: Manage apt repositories
@@ -78,7 +78,7 @@
       register: add_nv_repos
 
     - name: Update Apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: true
       when: (add_nv_repos is changed) or (_cleanup_apt_repositories is changed)
       register: update_apt_cache
@@ -90,7 +90,7 @@
     - "ansible_facts['pkg_mgr'] == 'apt'"
 
 - name: Add docker repo
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
     baseurl: "{{ item.repo }}"
@@ -107,7 +107,7 @@
     - ansible_facts['pkg_mgr'] == 'dnf'
 
 - name: Enable module_hotfixes
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "/etc/yum.repos.d/{{ item.name }}.repo"
     line: "module_hotfixes=1"
     regexp: "^module_hotfixes"
@@ -117,7 +117,7 @@
     - ansible_facts['os_family'] | lower == 'redhat'
 
 - name: Install compute distro packages
-  package:
+  ansible.builtin.package:
     name: "{{ zun_distro_compute_packages }}"
     state: "{{ zun_package_state }}"
     update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
@@ -128,7 +128,7 @@
   when: zun_kata_enabled | bool
   block:
     - name: Download kata package
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ zun_kata_package_source }}"
         dest: "/opt/{{ zun_kata_package_source | basename }}"
         mode: "0440"
@@ -136,7 +136,7 @@
       register: _kata_downloaded
 
     - name: Unpack package
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/opt/{{ zun_kata_package_source | basename }}"
         dest: /opt/
         remote_src: true
@@ -149,7 +149,7 @@
         - Restart containerd
 
     - name: Symlink kata binaries to PATH
-      file:
+      ansible.builtin.file:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
         state: link
@@ -162,7 +162,7 @@
           dest: /usr/local/bin/kata-runtime
 
     - name: Ensure the containerd config directory exists
-      file:
+      ansible.builtin.file:
         path: "/etc/containerd"
         state: "directory"
         owner: "root"
@@ -170,7 +170,7 @@
         mode: "0755"
 
     - name: Configure containerd
-      template:
+      ansible.builtin.template:
         src: "config.toml.j2"
         dest: "/etc/containerd/config.toml"
         mode: "0644"
@@ -180,7 +180,7 @@
         - Restart containerd
 
 - name: Ensure the Docker config directory exists
-  file:
+  ansible.builtin.file:
     path: "/etc/docker"
     state: "directory"
     owner: "root"
@@ -204,7 +204,7 @@
     - Restart docker
 
 - name: Create the kuryr system group
-  group:
+  ansible.builtin.group:
     name: "{{ zun_kuryr_system_group_name }}"
     gid: "{{ zun_kuryr_system_group_gid | default(omit) }}"
     state: "present"
@@ -213,7 +213,7 @@
     - zun-kuryr-group
 
 - name: Create the kuryr system user
-  user:
+  ansible.builtin.user:
     name: "{{ zun_kuryr_system_user_name }}"
     uid: "{{ zun_kuryr_system_user_uid | default(omit) }}"
     group: "{{ zun_kuryr_system_group_name }}"
@@ -227,7 +227,7 @@
     - zun-kuryr-user
 
 - name: Create kuryr dir
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
     owner: "{{ item.owner | default('root') }}"
@@ -279,14 +279,14 @@
     - Restart docker
 
 - name: Ensure docker users are added to the docker group
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     groups: "{{ zun_docker_groupname }}"
     append: true
   with_items: "{{ zun_docker_users }}"
 
 - name: Drop sudoers file
-  template:
+  ansible.builtin.template:
     src: "sudoers.j2"
     dest: "/etc/sudoers.d/{{ zun_system_user_name }}_sudoers"
     mode: "0440"
@@ -297,19 +297,19 @@
     - zun-sudoers
 
 - name: Configure multipathd (RedHat only)
-  command:
+  ansible.builtin.command:
     cmd: "/sbin/mpathconf --enable"
     creates: "/etc/multipath.conf"
   when: ansible_facts['os_family'] == "RedHat"
 
 - name: Enable multipathd service
-  systemd:
+  ansible.builtin.systemd:
     name: multipathd
     state: started
     enabled: true
 
 - name: Create script to clean up old Docker data
-  template:
+  ansible.builtin.template:
     src: "zun-docker-cleanup.j2"
     dest: "{{ zun_bin }}/zun-docker-cleanup"
     owner: "root"
@@ -317,12 +317,12 @@
     mode: "0755"
 
 - name: Set state for timed data cleanup
-  file:
+  ansible.builtin.file:
     path: "/var/tmp/zun-docker-cleanup.disabled"
     state: "{{ zun_docker_prune_images | ternary('absent', 'touch') }}"
     mode: "0644"
 
 - name: Remove legacy systemd docker override
-  file:
+  ansible.builtin.file:
     path: "/etc/systemd/system/docker.service.d/zun-docker.conf"
     state: absent

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 - name: Stop containerd
-  systemd:
+  ansible.builtin.systemd:
     name: "containerd"
     enabled: true
     state: "stopped"
@@ -26,7 +26,7 @@
   listen: "Restart containerd"
 
 - name: Start containerd
-  systemd:
+  ansible.builtin.systemd:
     name: "containerd"
     enabled: true
     state: "started"
@@ -38,7 +38,7 @@
   listen: "Restart containerd"
 
 - name: Stop docker
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
     state: "stopped"
@@ -53,7 +53,7 @@
   listen: "Restart docker"
 
 - name: Start docker
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
     state: "started"
@@ -68,7 +68,7 @@
   listen: "Restart docker"
 
 - name: Stop services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item.service_name }}"
     enabled: true
     state: "stopped"
@@ -85,7 +85,7 @@
     - "cert installed"
 
 - name: Start services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item.service_name }}"
     enabled: true
     state: "started"

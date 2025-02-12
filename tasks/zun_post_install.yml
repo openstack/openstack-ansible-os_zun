@@ -16,7 +16,7 @@
 - name: Define the docker api
   block:
     - name: Get docker api version
-      command: >-
+      ansible.builtin.command: >-
         {% raw %}
         docker version -f "{{ .Client.APIVersion }}"
         {% endraw %}
@@ -25,7 +25,7 @@
       register: docker_version
 
     - name: Set docker api version fact
-      set_fact:
+      ansible.builtin.set_fact:
         zun_docker_api_version: "{{ docker_version.stdout | trim }}"
   when:
     - zun_services['zun-compute']['group'] in group_names
@@ -70,7 +70,7 @@
     - zun-policy-override
 
 - name: Remove legacy policy.yaml file
-  file:
+  ansible.builtin.file:
     path: "/etc/zun/policy.yaml"
     state: absent
   when:
@@ -79,7 +79,7 @@
     - zun-policy-override
 
 - name: Synchronize the zun DB schema
-  command: "{{ zun_bin }}/zun-db-manage --config-dir /etc/zun upgrade"
+  ansible.builtin.command: "{{ zun_bin }}/zun-db-manage --config-dir /etc/zun upgrade"
   become: true
   become_user: "{{ zun_system_user_name }}"
   changed_when: false

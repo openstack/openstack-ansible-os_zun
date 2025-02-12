@@ -14,7 +14,7 @@
 # limitations under the License.
 
 - name: Create the system group
-  group:
+  ansible.builtin.group:
     name: "{{ zun_system_group_name }}"
     gid: "{{ zun_system_group_gid | default(omit) }}"
     state: "present"
@@ -23,7 +23,7 @@
     - zun-group
 
 - name: Create the zun system user
-  user:
+  ansible.builtin.user:
     name: "{{ zun_system_user_name }}"
     uid: "{{ zun_system_user_uid | default(omit) }}"
     group: "{{ zun_system_group_name }}"
@@ -36,7 +36,7 @@
     - zun-user
 
 - name: Create zun dir
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
     owner: "{{ item.owner | default(zun_system_user_name) }}"
@@ -57,7 +57,7 @@
     - zun-dirs
 
 - name: Drop sudoers file
-  template:
+  ansible.builtin.template:
     src: "sudoers.j2"
     dest: "/etc/sudoers.d/{{ zun_system_user_name }}_sudoers"
     mode: "0440"

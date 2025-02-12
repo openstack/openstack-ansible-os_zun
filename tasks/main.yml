@@ -14,7 +14,7 @@
 # limitations under the License.
 
 - name: Gather variables for each operating system
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       files:
@@ -30,12 +30,12 @@
     - always
 
 - name: Importing zun_pre_install tasks
-  import_tasks: zun_pre_install.yml
+  ansible.builtin.import_tasks: zun_pre_install.yml
   tags:
     - zun-install
 
 - name: Create and install SSL certificates
-  include_role:
+  ansible.builtin.include_role:
     name: pki
     tasks_from: main_certs.yml
     apply:
@@ -60,13 +60,13 @@
 # with a source install and wheels built on the repo server. We must
 # filter kuryr-lib out of u-c.
 - name: Retrieve the constraints URL
-  uri:
+  ansible.builtin.uri:
     url: "{{ zun_upper_constraints_url }}"
     return_content: true
   register: _u_c_contents
 
 - name: Install the python venv
-  import_role:
+  ansible.builtin.import_role:
     name: "python_venv_build"
   vars:
     venv_python_executable: "{{ zun_venv_python_executable }}"
@@ -83,7 +83,7 @@
     - zun-install
 
 - name: Including osa.mq_setup role
-  include_role:
+  ansible.builtin.include_role:
     name: openstack.osa.mq_setup
     apply:
       tags:
@@ -110,7 +110,7 @@
     - always
 
 - name: Including osa.db_setup role
-  include_role:
+  ansible.builtin.include_role:
     name: openstack.osa.db_setup
     apply:
       tags:
@@ -132,7 +132,7 @@
     - always
 
 - name: Including osa.service_setup role
-  include_role:
+  ansible.builtin.include_role:
     name: openstack.osa.service_setup
     apply:
       tags:
@@ -172,20 +172,20 @@
     - always
 
 - name: Importing zun_post_install tasks
-  import_tasks: zun_compute.yml
+  ansible.builtin.import_tasks: zun_compute.yml
   when:
     - "zun_services['zun-compute']['group'] in group_names"
   tags:
     - zun-compute
 
 - name: Importing zun_post_install tasks
-  import_tasks: zun_post_install.yml
+  ansible.builtin.import_tasks: zun_post_install.yml
   tags:
     - zun-config
     - post-install
 
 - name: Import uwsgi role
-  import_role:
+  ansible.builtin.import_role:
     name: uwsgi
   vars:
     uwsgi_services: "{{ uwsgi_zun_services }}"
@@ -195,7 +195,7 @@
     - uwsgi
 
 - name: Run the systemd service role
-  import_role:
+  ansible.builtin.import_role:
     name: systemd_service
   vars:
     systemd_user_name: "{{ zun_system_user_name }}"
