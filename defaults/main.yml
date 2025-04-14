@@ -77,8 +77,8 @@ zun_log_dir: "/var/log/zun"
 zun_lock_dir: "{{ openstack_lock_dir | default('/run/lock') }}"
 
 ## Kuryr user information
-zun_kuryr_system_user_name: kuryr
-zun_kuryr_system_group_name: kuryr
+zun_kuryr_system_user_name: root
+zun_kuryr_system_group_name: root
 zun_kuryr_system_shell: /bin/false
 zun_kuryr_system_comment: kuryr system user
 zun_kuryr_system_home_folder: "/var/lib/{{ zun_kuryr_system_user_name }}"
