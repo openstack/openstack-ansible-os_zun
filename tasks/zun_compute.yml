@@ -39,13 +39,6 @@
         that: _repo_check | length == 0
         fail_msg: "The following repository definitions must be updated to deb822 format {{ _repo_check }}"
 
-    # NOTE(jrosser) remove this task for the 2025.2 release
-    - name: Clean up legacy repository config not in deb822 format
-      ansible.builtin.file:
-        path: "/etc/apt/sources.list.d/docker-ce.list"
-        state: absent
-      register: _cleanup_apt_repositories
-
     - name: Ensure python3-debian package is available
       ansible.builtin.apt:
         name: python3-debian
@@ -88,7 +81,7 @@
     - name: Update Apt cache
       ansible.builtin.apt:
         update_cache: true
-      when: (add_nv_repos is changed) or (_cleanup_apt_repositories is changed)
+      when: add_nv_repos is changed
       register: update_apt_cache
       until: update_apt_cache is success
       retries: 5
