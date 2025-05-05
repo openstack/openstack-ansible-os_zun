@@ -132,7 +132,7 @@
         url: "{{ zun_kata_package_source }}"
         dest: "/opt/{{ zun_kata_package_source | basename }}"
         mode: "0440"
-        checksum: "{{ zun_kata_package_checksum }}"
+        checksum: "{{ zun_kata_package_checksum_mapping.get(ansible_facts['architecture']) }}"
       register: _kata_downloaded
 
     - name: Unpack package  # noqa: no-handler
