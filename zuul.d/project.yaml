@@ -21,11 +21,7 @@
       - build-release-notes-jobs-python3
     check:
       jobs:
-        - openstack-ansible-deploy-aio_ovs_lxc-centos-9-stream:
-            voting: false
-        - openstack-ansible-deploy-aio_metal_ovs-ubuntu-jammy
         - openstack-ansible-deploy-aio_metal_ovs-ubuntu-noble
     gate:
       jobs:
-        - openstack-ansible-deploy-aio_metal_ovs-ubuntu-jammy
         - openstack-ansible-deploy-aio_metal_ovs-ubuntu-noble
