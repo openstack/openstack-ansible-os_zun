@@ -312,7 +312,7 @@ zun_services:
     init_config_overrides: "{{ zun_api_init_overrides }}"
     start_order: 1
     wsgi_app: true
-    wsgi_path: "{{ zun_bin }}/zun-api-wsgi"
+    wsgi: "zun.wsgi.api:application"
     uwsgi_bind_address: "{{ zun_service_address }}"
     uwsgi_port: "{{ zun_service_port }}"
     uwsgi_overrides: "{{ zun_uwsgi_conf_overrides }}"
