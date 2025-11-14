@@ -59,22 +59,13 @@
     - zun-config
     - zun-post-install
 
-- name: Implement policy.yaml if there are overrides configured
+- name: Implement policy.yaml file
   openstack.config_template.config_template:
     content: "{{ zun_policy_overrides }}"
     dest: "/etc/zun/policy.yaml"
     config_type: yaml
   when:
-    - zun_policy_overrides | length > 0
-  tags:
-    - zun-policy-override
-
-- name: Remove legacy policy.yaml file
-  ansible.builtin.file:
-    path: "/etc/zun/policy.yaml"
-    state: absent
-  when:
-    - zun_policy_overrides | length == 0
+    - zun_services['zun-api']['group'] in group_names
   tags:
     - zun-policy-override
 
