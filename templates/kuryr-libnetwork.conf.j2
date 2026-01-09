@@ -1,5 +1,6 @@
-[DEFAULT]
+# {{ openstack_ansible_managed | default('OpenStack-Ansible Managed') }}
 
+[DEFAULT]
 debug = {{ debug | bool }}
 use_stderr = false
 use_journal = true
@@ -13,15 +14,12 @@ kuryr_uri = http://{{ zun_kuryr_service_address }}:{{ zun_kuryr_service_port }}
 # Do processing external connectivity (boolean value)
 process_external_connectivity = false
 
-
 [binding]
 # The name prefix of the veth endpoint put inside the container. (string value)
 veth_dst_prefix = veth
 
-
 [neutron]
 # Configuration options for OpenStack Neutron
-
 auth_url = {{ keystone_service_adminurl }}
 auth_type = {{ zun_keystone_auth_plugin }}
 endpoint_type = internal
