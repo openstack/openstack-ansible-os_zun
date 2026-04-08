@@ -47,11 +47,6 @@ zun_git_install_branch: master
 zun_kuryr_git_repo: https://opendev.org/openstack/kuryr-libnetwork
 zun_kuryr_git_install_branch: master
 
-# This is only required until kuryr-libnetwork depends upon a version of kuryr-lib
-# which includes https://review.opendev.org/c/openstack/kuryr/+/764908
-zun_kuryr_lib_git_repo: https://opendev.org/openstack/kuryr
-zun_kuryr_lib_git_install_branch: master
-
 zun_upper_constraints_url: >-
   {{ requirements_git_url | default('https://releases.openstack.org/constraints/upper/' ~ requirements_git_install_branch | default('master')) }}
 zun_git_constraints:
