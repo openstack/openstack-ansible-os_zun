@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 # Enable/Disable barbican configurations
 zun_barbican_enabled: "{{ (groups['barbican_all'] is defined) and (groups['barbican_all'] | length > 0) }}"
 # Enable/Disable designate configurations
@@ -273,7 +274,7 @@ zun_container_runtime: runc
 # compute the number of api workers to use.
 # zun_metadata_workers: 16
 
-## Cap the maximun number of threads / workers when a user value is unspecified.
+## Cap the maximum number of threads / workers when a user value is unspecified.
 zun_api_threads_max: 16
 zun_api_threads: >-
   {{ [[(ansible_facts['processor_vcpus'] // ansible_facts['processor_threads_per_core']) | default(1), 1] | max * 2, zun_api_threads_max] | min }}
