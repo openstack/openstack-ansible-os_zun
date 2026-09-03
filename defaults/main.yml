@@ -349,9 +349,9 @@ zun_services:
 
 # Common pip packages
 zun_pip_packages:
-  - "git+{{ zun_git_repo }}@{{ zun_git_install_branch }}#egg=zun"
-  - "git+{{ zun_kuryr_lib_git_repo }}@{{ zun_kuryr_lib_git_install_branch }}#egg=kuryr-lib"
-  - "git+{{ zun_kuryr_git_repo }}@{{ zun_kuryr_git_install_branch }}#egg=kuryr-libnetwork"
+  - "zun@git+{{ zun_git_repo }}@{{ zun_git_install_branch }}"
+  - "kuryr-lib@git+{{ zun_kuryr_lib_git_repo }}@{{ zun_kuryr_lib_git_install_branch }}"
+  - "kuryr-libnetwork@git+{{ zun_kuryr_git_repo }}@{{ zun_kuryr_git_install_branch }}"
   - oslo_rootwrap
   - osprofiler
   - python-memcached
