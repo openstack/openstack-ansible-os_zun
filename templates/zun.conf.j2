@@ -24,6 +24,11 @@ endpoint_type = {{ zun_service_endpoint_type }}
 {% if group_names | intersect(zun_services.keys() | difference('zun-compute') | map('extract', zun_services, 'group') | list) | count > 0 %}
 [database]
 connection = mysql+pymysql://{{ zun_galera_user }}:{{ zun_galera_password }}@{{ zun_galera_address }}:{{ zun_galera_port }}/{{ zun_galera_database }}?charset=utf8{% if zun_galera_use_ssl | bool %}&ssl_verify_cert=true{% if zun_galera_ssl_ca_cert | length > 0 %}&ssl_ca={{ zun_galera_ssl_ca_cert }}{% endif %}{% endif +%}
+{% if zun_galera_readonly_connection_enabled | bool %}
+slave_connection = mysql+pymysql://{{ zun_galera_user }}:{{ zun_galera_password }}@{{ zun_galera_readonly_address }}:{{ zun_galera_readonly_port }}/{{ zun_galera_database }}?charset=utf8{% if zun_galera_use_ssl | bool %}&ssl_verify_cert=true{% if zun_galera_ssl_ca_cert | length > 0 %}&ssl_ca={{ zun_galera_ssl_ca_cert }}{% endif %}{% endif +%}
+synchronous_reader = {{ zun_galera_synchronous_reader }}
+mysql_wsrep_sync_wait = {{ zun_galera_synchronous_reader | bool | ternary(0, 1) }}
+{% endif %}
 max_overflow = {{ zun_db_max_overflow }}
 max_pool_size = {{ zun_db_max_pool_size }}
 pool_timeout = {{ zun_db_pool_timeout }}
