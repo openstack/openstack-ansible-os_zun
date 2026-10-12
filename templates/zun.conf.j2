@@ -57,7 +57,7 @@ password = {{ zun_service_password }}
 
 [keystone_authtoken]
 auth_url = {{ keystone_service_adminurl }}
-www_authenticate_uri = {{ keystone_service_internaluri }}
+www_authenticate_uri = {{ keystone_service_publicuri }}
 auth_version = v3
 insecure = {{ keystone_service_internaluri_insecure | bool }}
 region_name = {{ keystone_service_region }}
